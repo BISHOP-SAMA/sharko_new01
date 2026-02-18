@@ -1,39 +1,10 @@
 import { motion } from "framer-motion";
 import { FloatingSharks } from "@/components/FloatingSharks";
-import { Footer } from "@/components/Footer";  // ← Add this import
+import { Footer } from "@/components/Footer";
 import logoImage from "@assets/logo-shark.png";
-import bishopImage from "@assets/Bishop.jpg";
-import allwellImage from "@assets/Allwell.jpg";
-import kageImage from "@assets/Kage.jpg";
-import pumpImage from "@assets/shacko-pump.png";
 import { Link } from "wouter";
-import { useState } from "react";
-import { ComicButton } from "@/components/ui/comic-button";
-import { useToast } from "@/hooks/use-toast";
-import { Sparkles, Clock, Trophy } from "lucide-react";
-
-const nfts = [
-  { id: 1, name: "SHACKO #001", rarity: "Legendary", image: bishopImage, multiplier: 5 },
-  { id: 2, name: "SHACKO #042", rarity: "Rare", image: allwellImage, multiplier: 3 },
-  { id: 3, name: "SHACKO #133", rarity: "Common", image: kageImage, multiplier: 1 },
-  { id: 4, name: "SHACKO #777", rarity: "Uncommon", image: pumpImage, multiplier: 2 },
-];
 
 export default function Staking() {
-  const { toast } = useToast();
-  const [stakedIds, setStakedIds] = useState<number[]>([]);
-  const [balance, setBalance] = useState(0);
-
-  const toggleStake = (id: number) => {
-    if (stakedIds.includes(id)) {
-      setStakedIds(stakedIds.filter(i => i !== id));
-      toast({ title: "Unstaked!", description: "Your Shacko is resting." });
-    } else {
-      setStakedIds([...stakedIds, id]);
-      toast({ title: "Staked!", description: "Feeding your Shacko $ASS...", className: "bg-[#22c55e] text-white" });
-    }
-  };
-
   return (
     <div className="min-h-screen bg-gradient-to-b from-[#0ea5e9] via-[#38bdf8] to-[#7dd3fc] selection:bg-[#ec4899] selection:text-white overflow-x-hidden">
       <FloatingSharks />
@@ -56,16 +27,10 @@ export default function Staking() {
 
       <main className="pt-32 pb-20 px-6">
         <div className="max-w-7xl mx-auto">
-          {/* Header with Balance */}
-          <div className="flex flex-col md:flex-row justify-between items-center mb-12 gap-6 bg-white border-4 border-black p-8 rounded-3xl comic-shadow">
-            <div className="text-center md:text-left">
-              <h1 className="text-6xl font-[Bangers] text-[#0ea5e9] text-stroke">FEED YOUR SHACKO</h1>
-              <p className="text-xl font-bold text-slate-600">Stake your NFTs to earn $ASS tokens!</p>
-            </div>
-            <div className="bg-[#1e3a5f] border-4 border-black p-6 rounded-2xl text-center min-w-[200px]">
-              <p className="text-[#38bdf8] font-[Bangers] text-xl">YOUR BALANCE</p>
-              <p className="text-white font-[Bangers] text-4xl">{balance} $ASS</p>
-            </div>
+          {/* Header */}
+          <div className="text-center mb-12 bg-white border-4 border-black p-8 rounded-3xl comic-shadow">
+            <h1 className="text-6xl font-[Bangers] text-[#0ea5e9] text-stroke mb-4">FEED YOUR SHACKO</h1>
+            <p className="text-xl font-bold text-slate-600">Stake your NFTs to earn $ASS tokens!</p>
           </div>
 
           {/* How it Works Section */}
@@ -109,73 +74,39 @@ export default function Staking() {
                 </div>
               </div>
             </div>
-
-            {/* Pro Tip */}
-            <div className="mt-6 bg-gradient-to-r from-[#0ea5e9]/20 to-[#38bdf8]/20 border-2 border-[#0ea5e9]/30 rounded-2xl p-6">
-              <div className="flex items-start gap-3">
-                <Sparkles className="w-6 h-6 text-[#0ea5e9] flex-shrink-0 mt-1" />
-                <div>
-                  <h4 className="text-xl font-bold text-white mb-1">Pro tip</h4>
-                  <p className="text-gray-300">Connect your wallet to see your active stakes instantly.</p>
-                </div>
-              </div>
-            </div>
           </div>
 
-          {/* NFT Grid */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
-            {nfts.map((nft) => (
-              <motion.div
-                key={nft.id}
-                whileHover={{ y: -10 }}
-                className="bg-white border-4 border-black rounded-3xl overflow-hidden comic-shadow flex flex-col"
+          {/* Coming Soon Box */}
+          <motion.div
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            className="bg-gradient-to-br from-[#1e3a5f] to-[#2d5a7b] border-4 border-black rounded-3xl p-16 comic-shadow text-center"
+          >
+            <div className="text-8xl mb-6">🦈</div>
+            <h2 className="text-6xl font-[Bangers] text-white mb-4">COMING SOON!</h2>
+            <p className="text-2xl text-gray-200 mb-8 max-w-2xl mx-auto">
+              Staking is swimming your way! Connect your wallet and earn $ASS tokens soon.
+            </p>
+            <div className="flex gap-4 justify-center flex-wrap">
+              <Link href="/rewards">
+                <a className="bg-[#0ea5e9] text-white px-8 py-4 rounded-xl font-[Bangers] text-xl border-4 border-black hover:scale-105 transition-transform inline-block">
+                  VIEW REWARDS →
+                </a>
+              </Link>
+              <a
+                href="https://discord.gg/dfxMGDTnpM"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="bg-white text-[#0ea5e9] px-8 py-4 rounded-xl font-[Bangers] text-xl border-4 border-black hover:scale-105 transition-transform inline-block"
               >
-                <div className="aspect-square border-b-4 border-black relative">
-                  <img src={nft.image} alt={nft.name} className="w-full h-full object-cover" />
-                  <div className={`absolute top-4 right-4 px-3 py-1 rounded-full border-2 border-black font-bold text-sm ${
-                    nft.rarity === 'Legendary' ? 'bg-yellow-400' :
-                    nft.rarity === 'Rare' ? 'bg-purple-400' :
-                    nft.rarity === 'Uncommon' ? 'bg-blue-400' : 'bg-slate-300'
-                  }`}>
-                    {nft.rarity}
-                  </div>
-                </div>
-                <div className="p-6 flex-1 flex flex-col justify-between">
-                  <div>
-                    <h3 className="text-2xl font-[Bangers] mb-1">{nft.name}</h3>
-                    <p className="font-bold text-slate-500 mb-4">{nft.multiplier}x Multiplier</p>
-                  </div>
-                  
-                  {/* Action Buttons */}
-                  <div className="flex gap-2">
-                    <ComicButton 
-                      variant={stakedIds.includes(nft.id) ? "accent" : "primary"}
-                      className="flex-1"
-                      onClick={() => toggleStake(nft.id)}
-                    >
-                      {stakedIds.includes(nft.id) ? "UNSTAKE" : "STAKE"}
-                    </ComicButton>
-                    
-                    <Link href="/rewards">
-                      <a>
-                        <ComicButton 
-                          variant="secondary"
-                          className="px-4"
-                          title="View Rewards"
-                        >
-                          <Trophy className="w-5 h-5" />
-                        </ComicButton>
-                      </a>
-                    </Link>
-                  </div>
-                </div>
-              </motion.div>
-            ))}
-          </div>
+                JOIN DISCORD
+              </a>
+            </div>
+          </motion.div>
         </div>
       </main>
 
-      <Footer />  {/* ← Add the footer here */}
+      <Footer />
     </div>
   );
 }
