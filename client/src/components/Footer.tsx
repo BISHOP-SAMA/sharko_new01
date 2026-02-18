@@ -70,9 +70,7 @@ export function Footer() {
         <div className="mb-8 max-w-3xl mx-auto">
           <h3 className="text-center font-[Bangers] text-2xl text-white mb-3">Disclaimer</h3>
           <p className="text-center text-gray-400 text-sm leading-relaxed">
-            This platform simulates staking mechanics for the Shacko NFT collection. 
-            Always verify contract addresses and official links before any blockchain transaction. 
-            DYOR (Do Your Own Research) and never invest more than you can afford to lose.
+            Shacko is a digital collectible project. Verify official links before interacting.
           </p>
         </div>
 
