@@ -1,4 +1,9 @@
 [build]
   command = "npm run build"
   publish = "dist"
-  functions = "api"  # ← This tells Netlify to use your api/ folder
+  functions = "api"
+
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
