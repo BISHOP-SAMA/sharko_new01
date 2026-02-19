@@ -1,3 +1,4 @@
+cat > package.json << 'EOF'
 {
   "name": "sharks",
   "private": true,
@@ -52,3 +53,4 @@
     "vite": "^5.4.10"
   }
 }
+EOF
