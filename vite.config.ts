@@ -4,26 +4,18 @@ import path from "path";
 
 export default defineConfig({
   plugins: [react()],
-
-  // Treat client/ as the Vite project root (finds index.html there)
-  root: "./client",
-
-  // Asset paths relative to root (important for Cloudflare)
-  base: "/",
-
   resolve: {
     alias: {
-      "@": path.resolve(__dirname, "client/src"),
-      "@shared": path.resolve(__dirname, "shared"),
-      "@assets": path.resolve(__dirname, "attached_assets"),
+      "@": path.resolve(import.meta.dirname, "client", "src"),
+      "@shared": path.resolve(import.meta.dirname, "shared"),
+      "@assets": path.resolve(import.meta.dirname, "attached_assets"),
     },
   },
-
+  root: path.resolve(import.meta.dirname, "client"),
   build: {
-    outDir: path.resolve(__dirname, "dist/public"),
+    outDir: path.resolve(import.meta.dirname, "dist/public"),
     emptyOutDir: true,
   },
-
   server: {
     fs: {
       strict: true,
