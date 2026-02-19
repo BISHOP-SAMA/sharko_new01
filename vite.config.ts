@@ -5,19 +5,21 @@ import path from "path";
 export default defineConfig({
   plugins: [react()],
 
-  // Set root to client/ — Vite will look for index.html there
+  // Treat client/ as the Vite project root (finds index.html there)
   root: "./client",
+
+  // Asset paths relative to root (important for Cloudflare)
+  base: "/",
 
   resolve: {
     alias: {
-      "@": path.resolve(__dirname, "client/src"),      // Use __dirname instead of import.meta.dirname (more reliable in some envs)
+      "@": path.resolve(__dirname, "client/src"),
       "@shared": path.resolve(__dirname, "shared"),
       "@assets": path.resolve(__dirname, "attached_assets"),
     },
   },
 
   build: {
-    // Output to root/dist/public (your current setting)
     outDir: path.resolve(__dirname, "dist/public"),
     emptyOutDir: true,
   },
