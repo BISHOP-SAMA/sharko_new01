@@ -1,7 +1,7 @@
 import { GalleryGrid } from "@/components/GalleryGrid";
 import { FloatingSharks } from "@/components/FloatingSharks";
 import { MobileMenu } from "@/components/MobileMenu";
-import { Footer } from "@/components/Footer";  // ← Add this import
+import { Footer } from "@/components/Footer";
 import { motion, AnimatePresence } from "framer-motion";
 import { ComicButton } from "@/components/ui/comic-button";
 import { SiX, SiDiscord } from "react-icons/si";
@@ -11,9 +11,12 @@ import logoImage from "@assets/logo-shark.png";
 import heroImage from "@assets/hero-shark.png";
 import backShackoImage from "@assets/back-shacko.png";
 
+// Updated status type to include WL and combinations
+type WhitelistStatus = 'OG' | 'GTD' | 'WL' | 'OG+GTD' | 'OG+WL' | 'GTD+WL' | 'ALL' | 'NONE';
+
 export default function Home() {
   const [wallet, setWallet] = useState("");
-  const [status, setStatus] = useState<null | 'OG' | 'GTD' | 'BOTH' | 'NONE'>(null);
+  const [status, setStatus] = useState<WhitelistStatus | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [showModal, setShowModal] = useState(false);
@@ -88,6 +91,19 @@ export default function Home() {
     }
   };
 
+  // Helper function to check which badges to show
+  const shouldShowBadge = (badge: 'OG' | 'GTD' | 'WL') => {
+    if (!status || status === 'NONE') return false;
+    
+    if (status === 'ALL') return true;
+    
+    if (badge === 'OG') return status === 'OG' || status.includes('OG');
+    if (badge === 'GTD') return status === 'GTD' || status.includes('GTD');
+    if (badge === 'WL') return status === 'WL' || status.includes('WL');
+    
+    return false;
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-b from-[#0ea5e9] via-[#38bdf8] to-[#7dd3fc] selection:bg-[#ec4899] selection:text-white overflow-x-hidden">
       <FloatingSharks />
@@ -130,7 +146,8 @@ export default function Home() {
               </h2>
 
               <div className="flex justify-center gap-3 flex-wrap mb-6">
-                {(status === 'OG' || status === 'BOTH') && (
+                {/* OG Badge */}
+                {shouldShowBadge('OG') && (
                   <motion.div
                     initial={{ scale: 0 }}
                     animate={{ scale: 1 }}
@@ -140,14 +157,28 @@ export default function Home() {
                     👑 OG PHASE
                   </motion.div>
                 )}
-                {(status === 'GTD' || status === 'BOTH') && (
+                
+                {/* GTD Badge */}
+                {shouldShowBadge('GTD') && (
                   <motion.div
                     initial={{ scale: 0 }}
                     animate={{ scale: 1 }}
-                    transition={{ delay: status === 'BOTH' ? 0.4 : 0.2, type: "spring" }}
+                    transition={{ delay: 0.4, type: "spring" }}
                     className="bg-gradient-to-r from-blue-400 to-cyan-500 text-black px-6 py-3 rounded-xl font-[Bangers] text-2xl border-3 border-black comic-shadow"
                   >
                     💎 GTD PHASE
+                  </motion.div>
+                )}
+                
+                {/* WL Badge - NEW! */}
+                {shouldShowBadge('WL') && (
+                  <motion.div
+                    initial={{ scale: 0 }}
+                    animate={{ scale: 1 }}
+                    transition={{ delay: 0.6, type: "spring" }}
+                    className="bg-gradient-to-r from-green-400 to-teal-500 text-black px-6 py-3 rounded-xl font-[Bangers] text-2xl border-3 border-black comic-shadow"
+                  >
+                    🎟️ WL PHASE
                   </motion.div>
                 )}
               </div>
@@ -248,7 +279,7 @@ export default function Home() {
             className="bg-white border-4 border-black rounded-3xl p-10 comic-shadow text-center"
           >
             <h2 className="text-6xl font-[Bangers] text-[#0ea5e9] text-stroke mb-4 uppercase">CHECK THE LIST</h2>
-            <p className="text-xl font-bold mb-8 text-slate-700">Are you an OG or a GTD shark? Paste your wallet below!</p>
+            <p className="text-xl font-bold mb-8 text-slate-700">Are you OG, GTD, or WL? Paste your wallet below!</p>
             
             <div className="space-y-4">
               <input 
@@ -292,7 +323,7 @@ export default function Home() {
         <GalleryGrid />
       </div>
 
-      <Footer />  {/* ← Replace the old footer with just this */}
+      <Footer />
     </div>
   );
-        }
+}
