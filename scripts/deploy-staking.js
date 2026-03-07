@@ -2,18 +2,18 @@ const hre = require("hardhat");
 
 async function main() {
   const SHACKO_NFT = process.env.SHACKO_NFT_ADDRESS;
-  const ASS_TOKEN = process.env.ASS_TOKEN_ADDRESS;
+  const SHACK_TOKEN = process.env.SHACK_TOKEN_ADDRESS;
 
-  if (!SHACKO_NFT || !ASS_TOKEN) {
+  if (!SHACKO_NFT || !SHACK_TOKEN) {
     throw new Error("Missing contract addresses in .env");
   }
 
   console.log("Deploying Staking Contract...");
   console.log("SHACKO NFT:", SHACKO_NFT);
-  console.log("$ASS Token:", ASS_TOKEN);
+  console.log("$SHACK Token:", SHACK_TOKEN);
 
   const ShackoStaking = await hre.ethers.getContractFactory("ShackoStaking");
-  const staking = await ShackoStaking.deploy(SHACKO_NFT, ASS_TOKEN);
+  const staking = await ShackoStaking.deploy(SHACKO_NFT, SHACK_TOKEN);
   await staking.waitForDeployment();
 
   const address = await staking.getAddress();
@@ -33,7 +33,7 @@ async function main() {
   
   console.log("\n🔧 NEXT STEPS:");
   console.log("1. Add staking contract as minter:");
-  console.log(`   assToken.addMinter("${address}")`);
+  console.log(`   shackToken.addMinter("${address}")`);
   console.log("2. Update .env with STAKING_CONTRACT_ADDRESS");
 }
 
