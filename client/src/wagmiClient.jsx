@@ -1,28 +1,27 @@
-import { getDefaultWallets, RainbowKitProvider } from '@rainbow-me/rainbowkit';
-import { configureChains, createClient, WagmiConfig } from 'wagmi';
-import { publicProvider } from 'wagmi/providers/public';
-import { sepolia, mainnet } from 'wagmi/chains';
+import '@rainbow-me/rainbowkit/styles.css';
+import { getDefaultConfig, RainbowKitProvider } from '@rainbow-me/rainbowkit';
+import { WagmiProvider } from 'wagmi';
+import { base, baseSepolia } from 'wagmi/chains';
+import { QueryClientProvider, QueryClient } from '@tanstack/react-query';
 
-const { chains, provider } = configureChains(
-  [sepolia, mainnet], // Replace sepolia with BaseSepolia if needed
-  [publicProvider()]
-);
-
-const { connectors } = getDefaultWallets({
-  appName: 'Shacko Staking',
-  chains
+// Configure wagmi
+export const config = getDefaultConfig({
+  appName: 'SHACKO Staking',
+  projectId: '5393dc3f086ed3291abbe5c3a7901d04',
+  chains: [base, baseSepolia],
+  ssr: false,
 });
 
-export const wagmiClient = createClient({
-  autoConnect: true,
-  connectors,
-  provider
-});
+// Create query client
+const queryClient = new QueryClient();
 
+// Wrapper component
 export const WagmiWrapper = ({ children }) => (
-  <WagmiConfig client={wagmiClient}>
-    <RainbowKitProvider chains={chains}>
-      {children}
-    </RainbowKitProvider>
-  </WagmiConfig>
+  <WagmiProvider config={config}>
+    <QueryClientProvider client={queryClient}>
+      <RainbowKitProvider>
+        {children}
+      </RainbowKitProvider>
+    </QueryClientProvider>
+  </WagmiProvider>
 );
