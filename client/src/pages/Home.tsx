@@ -4,6 +4,7 @@ import { MobileMenu } from "@/components/MobileMenu";
 import { Footer } from "@/components/Footer";
 import { motion, AnimatePresence } from "framer-motion";
 import { ComicButton } from "@/components/ui/comic-button";
+import { ConnectButton } from '@rainbow-me/rainbowkit'; // ← ADD THIS
 import { SiX, SiDiscord } from "react-icons/si";
 import { useState } from "react";
 import confetti from "canvas-confetti";
@@ -170,7 +171,7 @@ export default function Home() {
                   </motion.div>
                 )}
                 
-                {/* WL Badge - NEW! */}
+                {/* WL Badge */}
                 {shouldShowBadge('WL') && (
                   <motion.div
                     initial={{ scale: 0 }}
@@ -208,6 +209,11 @@ export default function Home() {
             <span className="text-3xl font-[Bangers] text-white text-stroke tracking-widest">
               SHACKO
             </span>
+          </div>
+          
+          {/* ADD CONNECT BUTTON HERE */}
+          <div className="hidden md:block">
+            <ConnectButton />
           </div>
         </div>
       </nav>
