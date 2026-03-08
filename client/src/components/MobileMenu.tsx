@@ -2,7 +2,8 @@
 
 import { motion, AnimatePresence } from "framer-motion";
 import { ConnectButton } from "@rainbow-me/rainbowkit";
-import Link from "next/link";
+// 1. CHANGE THIS IMPORT:
+import { Link } from "react-router-dom"; 
 
 interface MobileMenuProps {
   isOpen: boolean;
@@ -26,7 +27,7 @@ export default function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
     <AnimatePresence>
       {isOpen && (
         <>
-          {/* 1. Backdrop: Fades in to dim the page content */}
+          {/* Backdrop */}
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -35,7 +36,7 @@ export default function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
             onClick={onClose}
           />
 
-          {/* 2. Menu Panel: Slides down from behind the h-20 Navbar */}
+          {/* Menu Panel - Slides from behind Navbar (top-20) */}
           <motion.div
             initial={{ y: "-100%" }}
             animate={{ y: 0 }}
@@ -45,12 +46,12 @@ export default function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
           >
             <div className="p-6 flex flex-col h-full">
               
-              {/* Wallet Section: Boxed with the Shacko shadow style */}
+              {/* Wallet Section */}
               <div className="mb-8 p-4 bg-white border-4 border-black shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] inline-block w-fit">
                 <ConnectButton accountStatus="address" showBalance={false} />
               </div>
 
-              {/* Navigation: Bold, Italic, and Uppercase */}
+              {/* Navigation Links */}
               <nav className="flex flex-col space-y-2">
                 {links.map((link, i) => (
                   <motion.div
@@ -59,8 +60,9 @@ export default function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ delay: i * 0.05 }}
                   >
+                    {/* 2. ENSURE THIS IS THE REACT ROUTER LINK */}
                     <Link
-                      href={link.href}
+                      to={link.href}
                       onClick={onClose}
                       className="text-4xl font-black italic uppercase text-white hover:text-black transition-colors py-2 block drop-shadow-[2px_2px_0px_rgba(0,0,0,1)]"
                     >
@@ -70,7 +72,7 @@ export default function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
                 ))}
               </nav>
 
-              {/* Footer: Matches the Napo/Shacko license style */}
+              {/* Footer */}
               <div className="mt-auto pt-10 border-t-4 border-black/20">
                 <p className="text-black font-black italic uppercase text-lg mb-4">
                   THE CHOMP NEVER ENDS
