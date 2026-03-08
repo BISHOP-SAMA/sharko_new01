@@ -8,9 +8,10 @@ interface NavbarProps {
 
 export default function Navbar({ onMenuClick, isOpen }: NavbarProps) {
   return (
-    <nav className="fixed top-0 w-full z-[100] bg-[#0ea5e9] border-b-4 border-black">
-      <div className="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
+    <nav className="fixed top-0 w-full h-20 z-[100] bg-[#0ea5e9] border-b-4 border-black flex items-center">
+      <div className="max-w-7xl mx-auto px-6 w-full flex items-center justify-between">
         
+        {/* SHACKO Logo */}
         <Link href="/">
           <a className="text-4xl font-black italic tracking-tighter text-white uppercase cursor-pointer"
              style={{ WebkitTextStroke: '1.5px black' }}>
@@ -18,16 +19,20 @@ export default function Navbar({ onMenuClick, isOpen }: NavbarProps) {
           </a>
         </Link>
         
-        {/* HAMBURGER BUTTON - High visibility styling */}
+        {/* HAMBURGER BUTTON - Styled like the Geez site button */}
         <button
           type="button"
-          onClick={onMenuClick}
-          className="relative z-[110] p-2 bg-white border-4 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] active:shadow-none active:translate-x-[2px] active:translate-y-[2px] transition-all flex items-center justify-center"
+          onClick={(e) => {
+            e.stopPropagation(); // Prevents clicks from bubbling
+            onMenuClick();
+          }}
+          className="relative z-[110] p-2 bg-black border-2 border-white rounded-md flex items-center justify-center hover:scale-110 transition-transform active:scale-95"
+          aria-label="Toggle Menu"
         >
           {isOpen ? (
-            <X size={28} strokeWidth={4} className="text-black" />
+            <X size={28} strokeWidth={3} className="text-white" />
           ) : (
-            <Menu size={28} strokeWidth={4} className="text-black" />
+            <Menu size={28} strokeWidth={3} className="text-white" />
           )}
         </button>
       </div>
