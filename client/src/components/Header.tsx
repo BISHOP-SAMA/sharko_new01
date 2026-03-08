@@ -13,13 +13,13 @@ export default function Header() {
 
   return (
     <header className="relative w-full">
-      {/* The Navbar stays on top (z-50). 
-        Pass the toggle function to your existing Navbar component.
+      {/* CRITICAL FIX: Pass 'isOpen' to Navbar so the icon 
+        can switch between <Menu /> and <X /> 
       */}
-      <Navbar onMenuClick={toggleMenu} />
+      <Navbar onMenuClick={toggleMenu} isOpen={isOpen} />
 
-      {/* The MobileMenu sits behind/below (z-40).
-        It listens to the 'isOpen' state managed here.
+      {/* The MobileMenu uses top-20 to slide out from 
+        directly behind the h-20 Navbar 
       */}
       <MobileMenu isOpen={isOpen} onClose={closeMenu} />
     </header>
