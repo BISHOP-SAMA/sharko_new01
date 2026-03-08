@@ -1,31 +1,38 @@
-// App.tsx
 import React from "react";
 import { Route, Switch } from "wouter";
 
+// Page Imports
 import Home from "@/pages/Home";
 import About from "@/pages/About";
 import Staking from "@/pages/Staking";
-import Rewards from "@/pages/Rewards";  // Rewards page
+import Rewards from "@/pages/Rewards";
 import FAQ from "@/pages/FAQ";
+import Arcade from "@/pages/Arcade";
+import Lore from "@/pages/Lore";
+import Raffle from "@/pages/Raffle";
+import Shop from "@/pages/Shop";
+import Theatre from "@/pages/Theatre";
+import NotFound from "@/pages/not-found";
 
 function App() {
   return (
     <Switch>
+      {/* Primary Routes */}
       <Route path="/" component={Home} />
       <Route path="/about" component={About} />
       <Route path="/staking" component={Staking} />
-      <Route path="/rewards" component={Rewards} />  {/* Rewards route */}
+      <Route path="/rewards" component={Rewards} />
       <Route path="/faq" component={FAQ} />
+      
+      {/* Project Expansion Routes */}
+      <Route path="/arcade" component={Arcade} />
+      <Route path="/lore" component={Lore} />
+      <Route path="/raffle" component={Raffle} />
+      <Route path="/shop" component={Shop} />
+      <Route path="/theatre" component={Theatre} />
 
-      {/* 404 fallback */}
-      <Route>
-        <div className="min-h-screen flex items-center justify-center bg-[#0ea5e9]">
-          <div className="text-center">
-            <h1 className="text-6xl font-[Bangers] text-white mb-4">404</h1>
-            <p className="text-white text-xl">Page not found!</p>
-          </div>
-        </div>
-      </Route>
+      {/* 404 fallback using your dedicated not-found component */}
+      <Route component={NotFound} />
     </Switch>
   );
 }
