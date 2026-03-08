@@ -5,7 +5,7 @@ import { Menu, X } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { ConnectButton } from "@rainbow-me/rainbowkit";
 
-export default function MobileMenu() {
+export default function MobileMenu() {  // ✅ DEFAULT EXPORT (matches your import)
   const [open, setOpen] = useState(false);
 
   const links = [
@@ -24,11 +24,11 @@ export default function MobileMenu() {
 
   return (
     <>
-      {/* Hamburger button – visible only on mobile */}
+      {/* Hamburger button – always visible */}
       <button
         type="button"
         onClick={() => setOpen(true)}
-        className="md:hidden p-2.5 text-white hover:text-blue-300 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-400 rounded-lg"
+        className="p-2.5 text-white hover:text-blue-300 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-400 rounded-lg"
         aria-label="Open navigation menu"
       >
         <Menu size={28} strokeWidth={2.5} />
