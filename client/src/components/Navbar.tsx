@@ -1,5 +1,6 @@
 import { Menu, X } from "lucide-react";
-import { Link } from "react-router-dom"; // Essential for Vite/React Router
+// FIXED: Import from wouter to match your package.json
+import { Link } from "wouter"; 
 
 interface NavbarProps {
   onMenuClick: () => void;
@@ -11,13 +12,12 @@ export default function Navbar({ onMenuClick, isOpen }: NavbarProps) {
     <nav className="fixed top-0 w-full z-50 bg-[#0ea5e9] border-b-4 border-black">
       <div className="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
         
-        {/* SHACKO Logo - Now a functional link to Home.tsx */}
-        <Link 
-          to="/" 
-          className="text-4xl font-black italic tracking-tighter text-white uppercase"
-          style={{ WebkitTextStroke: '1.5px black' }}
-        >
-          SHACKO
+        {/* SHACKO Logo - Functional link using Wouter */}
+        <Link href="/">
+          <a className="text-4xl font-black italic tracking-tighter text-white uppercase"
+             style={{ WebkitTextStroke: '1.5px black' }}>
+            SHACKO
+          </a>
         </Link>
         
         {/* Hamburger Menu Button */}
