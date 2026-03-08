@@ -2,7 +2,7 @@
 
 import { GalleryGrid } from "@/components/GalleryGrid";
 import { FloatingSharks } from "@/components/FloatingSharks";
-import MobileMenu from "@/components/MobileMenu"; // ← FIXED: default import (no curly braces)
+import MobileMenu from "@/components/MobileMenu"; // default import
 import { Footer } from "@/components/Footer";
 import { motion, AnimatePresence } from "framer-motion";
 import { ComicButton } from "@/components/ui/comic-button";
@@ -11,8 +11,41 @@ import { useState } from "react";
 import confetti from "canvas-confetti";
 import heroImage from "@assets/hero-shark.png";
 import backShackoImage from "@assets/back-shacko.png";
+import bishopImage from "@assets/Bishop.jpg";
+import allwellImage from "@assets/Allwell.jpg";
+import kageImage from "@assets/Kage.jpg";
 
-// Updated status type to include WL and combinations
+// Team data (moved from About.tsx)
+const team = [
+  {
+    name: "BISHOP",
+    role: "Product Manager",
+    image: bishopImage,
+    traits: ["Jack of all trades", "Works without break", "Part time degen"],
+  },
+  {
+    name: "Allwell",
+    role: "Developer",
+    image: allwellImage,
+    traits: [
+      "He's the small voice you hear in your head sometimes",
+      "Always pitching ideas somewhere to someone",
+      "Fast leaner",
+    ],
+  },
+  {
+    name: "KAGE",
+    role: "CM",
+    image: kageImage,
+    traits: [
+      "Loses money everyday trading",
+      "Collaborative learner",
+      "The missing piece your project needs",
+    ],
+  },
+];
+
+// Whitelist status type
 type WhitelistStatus = "OG" | "GTD" | "WL" | "OG+GTD" | "OG+WL" | "GTD+WL" | "ALL" | "NONE";
 
 export default function Home() {
@@ -92,7 +125,6 @@ export default function Home() {
     }
   };
 
-  // Helper function to check which badges to show
   const shouldShowBadge = (badge: "OG" | "GTD" | "WL") => {
     if (!status || status === "NONE") return false;
 
@@ -147,7 +179,6 @@ export default function Home() {
               </h2>
 
               <div className="flex justify-center gap-3 flex-wrap mb-6">
-                {/* OG Badge */}
                 {shouldShowBadge("OG") && (
                   <motion.div
                     initial={{ scale: 0 }}
@@ -159,7 +190,6 @@ export default function Home() {
                   </motion.div>
                 )}
 
-                {/* GTD Badge */}
                 {shouldShowBadge("GTD") && (
                   <motion.div
                     initial={{ scale: 0 }}
@@ -171,7 +201,6 @@ export default function Home() {
                   </motion.div>
                 )}
 
-                {/* WL Badge */}
                 {shouldShowBadge("WL") && (
                   <motion.div
                     initial={{ scale: 0 }}
@@ -196,18 +225,15 @@ export default function Home() {
         )}
       </AnimatePresence>
 
-      {/* Navbar - Azuki Style */}
+      {/* Navbar */}
       <nav className="fixed top-0 w-full z-50 bg-[#0ea5e9]/90 backdrop-blur-md border-b-4 border-black">
         <div className="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
-          {/* Left - SHACKO Text (no logo) */}
           <span className="text-4xl font-bold tracking-tight text-white">SHACKO</span>
-
-          {/* Right - Mobile Menu (hamburger) */}
           <MobileMenu />
         </div>
       </nav>
 
-      {/* Hero Section */}
+      {/* Hero */}
       <section className="relative pt-28 pb-8 px-6 min-h-screen flex flex-col items-center justify-center">
         <motion.div
           initial={{ y: -50, opacity: 0 }}
@@ -246,7 +272,7 @@ export default function Home() {
         </motion.div>
       </section>
 
-      {/* Marquee Banner */}
+      {/* Marquee */}
       <div className="bg-[#1e293b] border-y-4 border-black py-4 overflow-hidden">
         <motion.div
           animate={{ x: ["0%", "-50%"] }}
@@ -261,7 +287,7 @@ export default function Home() {
         </motion.div>
       </div>
 
-      {/* Wallet Check Section */}
+      {/* Wallet Checker */}
       <section
         id="whitelist-checker"
         className="relative py-32 bg-[#0ea5e9] border-y-4 border-black overflow-hidden"
@@ -323,6 +349,51 @@ export default function Home() {
         </div>
       </section>
 
+      {/* Team Section (moved here from About) */}
+      <section className="py-24 px-6 bg-gradient-to-b from-transparent to-black/10">
+        <div className="max-w-7xl mx-auto">
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="text-center mb-16"
+          >
+            <h2 className="text-6xl md:text-8xl font-[Bangers] text-white text-stroke mb-4">
+              MEET THE SQUAD
+            </h2>
+            <p className="text-2xl font-bold text-slate-800">The crew making the ocean shake</p>
+          </motion.div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
+            {team.map((member, idx) => (
+              <motion.div
+                key={idx}
+                initial={{ opacity: 0, scale: 0.9 }}
+                whileInView={{ opacity: 1, scale: 1 }}
+                viewport={{ once: true }}
+                transition={{ delay: idx * 0.2 }}
+                className="bg-white border-4 border-black rounded-3xl p-8 comic-shadow"
+              >
+                <div className="aspect-square rounded-2xl border-4 border-black overflow-hidden mb-6">
+                  <img src={member.image} alt={member.name} className="w-full h-full object-cover" />
+                </div>
+                <h3 className="text-4xl font-[Bangers] text-[#0ea5e9] mb-1">{member.name}</h3>
+                <p className="text-xl font-bold text-[#ec4899] mb-4 uppercase">{member.role}</p>
+                <ul className="space-y-2">
+                  {member.traits.map((trait, i) => (
+                    <li key={i} className="flex items-start gap-2 font-bold text-slate-700">
+                      <span className="mt-1.5 w-2 h-2 rounded-full bg-black shrink-0" />
+                      {trait}
+                    </li>
+                  ))}
+                </ul>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Gallery */}
       <div id="vibes">
         <GalleryGrid />
       </div>
