@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Menu, X } from "lucide-react"; // ← Re-added Menu import
+import { Menu, X } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { ConnectButton } from '@rainbow-me/rainbowkit';
 
@@ -22,7 +22,7 @@ export function MobileMenu() {
 
   return (
     <>
-      {/* Hamburger Button – visible on the main page */}
+      {/* Hamburger button on main page */}
       <button
         onClick={() => setIsOpen(true)}
         className="p-2 text-white hover:text-gray-200 transition-colors"
@@ -31,65 +31,65 @@ export function MobileMenu() {
         <Menu size={28} strokeWidth={2.5} />
       </button>
 
-      {/* Full-Screen Menu Overlay */}
       <AnimatePresence>
         {isOpen && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.3 }}
-            className="fixed inset-0 bg-gradient-to-b from-[#0077ff] to-[#0055cc] z-[100] flex flex-col text-white" // ← Blue ocean theme to match homepage
-          >
-            {/* Minimal header: thin black line + close button only */}
-            <div className="sticky top-0 bg-transparent z-10">
-              <div className="flex items-center justify-end px-6 h-14 border-b border-black">
-                <button
-                  onClick={() => setIsOpen(false)}
-                  className="p-2 hover:bg-black/20 rounded-lg transition-colors"
-                  aria-label="Close menu"
-                >
-                  <X size={28} strokeWidth={2.5} className="text-white" />
-                </button>
-              </div>
-            </div>
+          <>
+            {/* Backdrop – semi-transparent so hero is visible underneath */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="fixed inset-0 bg-black/40 backdrop-blur-sm z-[99]"
+              onClick={() => setIsOpen(false)} // close on backdrop click
+            />
 
-            {/* Content starts immediately under the black line */}
-            <div className="flex-1 px-6 py-8 overflow-y-auto">
-              {/* Connect Wallet section */}
-              <div className="mb-10 pb-8 border-b border-white/20">
-                <h3 className="text-white font-bold text-lg mb-4 uppercase tracking-wider">
-                  Connect Wallet
-                </h3>
-                <div className="max-w-xs">
+            {/* Side panel slide-in from right – starts near top */}
+            <motion.div
+              initial={{ x: "100%" }}
+              animate={{ x: 0 }}
+              exit={{ x: "100%" }}
+              transition={{ type: "spring", damping: 25, stiffness: 200 }}
+              className="fixed right-0 top-0 h-full w-4/5 max-w-sm bg-gradient-to-b from-[#001f3f] to-[#000814] z-[100] overflow-y-auto shadow-2xl"
+            >
+              {/* Close button – floating top-right, no full header bar */}
+              <button
+                onClick={() => setIsOpen(false)}
+                className="absolute top-5 right-5 p-2 text-white hover:text-blue-300 transition-colors z-10"
+                aria-label="Close menu"
+              >
+                <X size={32} strokeWidth={2.5} />
+              </button>
+
+              {/* Content starts near top – small padding only */}
+              <div className="pt-20 px-6 pb-10"> {/* pt-20 gives space under close button */}
+                {/* Connect Wallet – prominent */}
+                <div className="mb-10">
+                  <h3 className="text-blue-300 font-bold text-lg uppercase tracking-wider mb-4">
+                    Connect Wallet
+                  </h3>
                   <ConnectButton />
                 </div>
+
+                {/* Menu items – clean, spaced, with arrow */}
+                <nav className="space-y-6">
+                  {menuItems.map((item, index) => (
+                    <motion.a
+                      key={item.name}
+                      href={item.href}
+                      onClick={() => setIsOpen(false)}
+                      initial={{ opacity: 0, x: -20 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      transition={{ delay: index * 0.05 }}
+                      className="block text-2xl font-bold uppercase tracking-wide text-white hover:text-blue-300 transition-colors flex items-center justify-between"
+                    >
+                      {item.name}
+                      <span className="text-blue-500 text-3xl">→</span>
+                    </motion.a>
+                  ))}
+                </nav>
               </div>
-
-              {/* Navigation items */}
-              <nav className="space-y-2">
-                {menuItems.map((item, index) => (
-                  <motion.a
-                    key={item.name}
-                    href={item.href}
-                    onClick={() => setIsOpen(false)}
-                    initial={{ opacity: 0, x: -20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: index * 0.04 }}
-                    className="block py-4 text-2xl font-bold uppercase tracking-wide hover:text-blue-200 transition-colors border-b border-white/10 last:border-b-0"
-                  >
-                    {item.name}
-                    <span className="float-right text-white/60">→</span>
-                  </motion.a>
-                ))}
-              </nav>
-
-              {/* Optional: keep footer minimal or remove if you want */}
-              {/* <div className="mt-12 pt-8 text-sm text-white/60">
-                <p>SHACKO © 2026</p>
-              </div> */}
-            </div>
-          </motion.div>
+            </motion.div>
+          </>
         )}
       </AnimatePresence>
     </>
