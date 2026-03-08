@@ -1,85 +1,98 @@
 import { useState } from "react";
-import { Menu, X } from "lucide-react";
+import { X } from "lucide-react"; // Removed Menu since it's not used here
 import { motion, AnimatePresence } from "framer-motion";
 import { ConnectButton } from '@rainbow-me/rainbowkit';
 
 export function MobileMenu() {
   const [isOpen, setIsOpen] = useState(false);
 
-  // Trimmed & matched to your screenshots + project focus
   const menuItems = [
-    { name: "ABOUT", href: "/about" },
-    { name: "LORE", href: "/lore" },
-    { name: "RAFFLES", href: "/raffles" },
-    { name: "SHARK BANK", href: "/shark-bank" },
-    { name: "SHACKO PUMP", href: "/shacko-pump" },
-    { name: "THEATRE", href: "/theatre" },
-    { name: "STAKING", href: "/staking" },
-    { name: "REWARDS", href: "/rewards" },
-    { name: "COMMUNITY", href: "/community" },
+    { name: "About", href: "/about" },
+    { name: "Lore", href: "/lore" },
+    { name: "Arcade", href: "/arcade" },
+    { name: "Shacko Pump", href: "/shacko-pump" },
+    { name: "Theatre", href: "/theatre" },
+    { name: "Staking", href: "/staking" },
+    { name: "Rewards", href: "/rewards" },
+    { name: "Community", href: "/community" },
+    { name: "Store", href: "#shop" },
+    { name: "FAQ", href: "/faq" },
+    { name: "Socials", href: "#socials" },
   ];
 
   return (
     <>
-      {/* Menu Button */}
+      {/* Menu Button (hamburger) – remains on the main page */}
       <button
         onClick={() => setIsOpen(true)}
-        className="p-2 text-white hover:text-gray-300 transition-colors"
+        className="p-2 text-white hover:text-gray-200 transition-colors"
         aria-label="Open menu"
       >
         <Menu size={28} strokeWidth={2.5} />
       </button>
 
-      {/* Full-Screen Overlay – Dark thematic bg */}
+      {/* Full-Screen Menu Overlay */}
       <AnimatePresence>
         {isOpen && (
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            transition={{ duration: 0.25 }}
-            className="fixed inset-0 bg-gradient-to-b from-[#001122] to-[#000814] z-[100] overflow-y-auto text-white"
+            transition={{ duration: 0.3 }}
+            className="fixed inset-0 bg-white z-[100] flex flex-col"
           >
-            {/* Fixed Header */}
-            <div className="sticky top-0 bg-[#001122]/90 backdrop-blur-md z-10">
-              <div className="flex items-center justify-between px-6 h-16 border-b border-blue-900/30">
-                <span className="text-2xl font-black tracking-tight text-white">SHACKO</span>
+            {/* Minimal Header – just close button + thin black border line */}
+            <div className="sticky top-0 bg-white z-10">
+              <div className="flex items-center justify-end px-6 h-16 border-b border-black">
                 <button
                   onClick={() => setIsOpen(false)}
-                  className="p-2 hover:bg-white/10 rounded-full transition-colors"
+                  className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+                  aria-label="Close menu"
                 >
-                  <X size={28} strokeWidth={2.5} className="text-white" />
+                  <X size={28} strokeWidth={2.5} className="text-black" />
                 </button>
               </div>
             </div>
 
-            {/* Content – More breathing room */}
-            <div className="px-6 py-10">
-              {/* Connect Wallet – Prominent, Azuki-like */}
-              <div className="mb-10">
+            {/* Menu Content – starts right below the black line */}
+            <div className="flex-1 px-6 py-8 overflow-y-auto">
+              {/* Connect Wallet */}
+              <div className="mb-12 pb-8 border-b border-gray-200">
+                <h3 className="text-red-500 font-bold text-sm mb-4 uppercase tracking-wider">
+                  Connect Wallet
+                </h3>
                 <ConnectButton />
               </div>
 
-              {/* Menu Items – Clean, uppercase, arrow right, more space */}
-              <nav className="space-y-1">
+              {/* Menu Items */}
+              <nav className="space-y-0">
                 {menuItems.map((item, index) => (
                   <motion.div
                     key={item.name}
                     initial={{ opacity: 0, x: -20 }}
                     animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: index * 0.04 }}
+                    transition={{ delay: index * 0.05 }}
                   >
                     <a
                       href={item.href}
                       onClick={() => setIsOpen(false)}
-                      className="flex items-center justify-between py-4 text-xl font-bold uppercase tracking-wide hover:text-blue-300 transition-colors border-b border-blue-900/40 last:border-b-0"
+                      className="block py-4 text-2xl font-bold text-black hover:text-gray-600 transition-colors border-b border-gray-100 uppercase tracking-tight"
                     >
-                      <span>{item.name}</span>
-                      <span className="text-blue-500 text-2xl">→</span>
+                      {item.name}
+                      <span className="float-right text-gray-400">→</span>
                     </a>
                   </motion.div>
                 ))}
               </nav>
+
+              {/* Footer – still here, but can be removed if you want full Azuki minimalism */}
+              <div className="mt-12 pt-8 border-t border-gray-200">
+                <p className="text-xs text-gray-400 uppercase tracking-wider mb-2">License</p>
+                <p className="text-xs text-gray-400 uppercase tracking-wider mb-4">Terms & Conditions</p>
+                <p className="text-xs text-gray-500 mt-6">SHACKO LABS, INC © 2026</p>
+                <p className="text-xs text-gray-500">MADE WITH ❤️ ON BASE</p>
+                <p className="text-xs text-gray-500">HELLO@SHACKO.XYZ</p>
+              </div>
             </div>
           </motion.div>
         )}
