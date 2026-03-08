@@ -1,13 +1,11 @@
 import { motion, AnimatePresence } from "framer-motion";
 import { FloatingSharks } from "@/components/FloatingSharks";
 import { Footer } from "@/components/Footer";
-import { MobileMenu } from "@/components/MobileMenu";
+import MobileMenu from "@/components/MobileMenu";
 import { ConnectButton } from '@rainbow-me/rainbowkit';
 import { useAccount, useReadContract, useWriteContract, useWaitForTransactionReceipt } from 'wagmi';
 import { parseAbi, formatEther, parseEther } from 'viem';
 import { useState } from "react";
-import logoImage from "@assets/logo-shark.png";
-import { Link } from "wouter";
 
 // Contract addresses (UPDATE AFTER DEPLOYMENT)
 const SHACKO_NFT = '0x12940C944f56273EA27BA3271A4E7B04db426ca7';
@@ -152,21 +150,8 @@ export default function Staking() {
       {/* Navbar */}
       <nav className="fixed top-0 w-full z-50 bg-[#0ea5e9]/90 backdrop-blur-md border-b-4 border-black">
         <div className="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
-          <div className="flex items-center gap-4">
-            <MobileMenu />
-            <Link href="/">
-              <a className="flex items-center gap-3">
-                <img src={logoImage} alt="Shacko Logo" className="w-12 h-12 object-contain" />
-                <span className="text-3xl font-[Bangers] text-white text-stroke tracking-widest">SHACKO</span>
-              </a>
-            </Link>
-          </div>
-          <div className="hidden md:flex items-center gap-6">
-            <Link href="/about"><a className="font-[Bangers] text-xl text-white hover:text-[#ec4899]">About</a></Link>
-            <Link href="/staking"><a className="font-[Bangers] text-xl text-white hover:text-[#ec4899]">Staking</a></Link>
-            <Link href="/rewards"><a className="font-[Bangers] text-xl text-white hover:text-[#ec4899]">Rewards</a></Link>
-            <ConnectButton />
-          </div>
+          <span className="text-4xl font-bold tracking-tight text-white">SHACKO</span>
+          <MobileMenu />
         </div>
       </nav>
 
