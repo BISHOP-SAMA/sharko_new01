@@ -1,342 +1,103 @@
-import { GalleryGrid } from "@/components/GalleryGrid";
-import { FloatingSharks } from "@/components/FloatingSharks";
-import { MobileMenu } from "@/components/MobileMenu";
-import { Footer } from "@/components/Footer";
-import { motion, AnimatePresence } from "framer-motion";
-import { ComicButton } from "@/components/ui/comic-button";
-import { ConnectButton } from '@rainbow-me/rainbowkit';
-import { SiX, SiDiscord } from "react-icons/si";
 import { useState } from "react";
-import confetti from "canvas-confetti";
-import heroImage from "@assets/hero-shark.png";
-import backShackoImage from "@assets/back-shacko.png";
+import { Menu, X } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
+import { ConnectButton } from '@rainbow-me/rainbowkit';
 
-// Updated status type to include WL and combinations
-type WhitelistStatus = 'OG' | 'GTD' | 'WL' | 'OG+GTD' | 'OG+WL' | 'GTD+WL' | 'ALL' | 'NONE';
+export function MobileMenu() {
+  const [isOpen, setIsOpen] = useState(false);
 
-export default function Home() {
-  const [wallet, setWallet] = useState("");
-  const [status, setStatus] = useState<WhitelistStatus | null>(null);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
-  const [showModal, setShowModal] = useState(false);
-
-  const scrollToVibes = () => {
-    document.getElementById('vibes')?.scrollIntoView({ behavior: 'smooth' });
-  };
-
-  const fireConfetti = () => {
-    const duration = 3000;
-    const end = Date.now() + duration;
-
-    const frame = () => {
-      confetti({
-        particleCount: 3,
-        angle: 60,
-        spread: 55,
-        origin: { x: 0 },
-        colors: ['#0ea5e9', '#38bdf8', '#ec4899', '#fbbf24']
-      });
-      confetti({
-        particleCount: 3,
-        angle: 120,
-        spread: 55,
-        origin: { x: 1 },
-        colors: ['#0ea5e9', '#38bdf8', '#ec4899', '#fbbf24']
-      });
-
-      if (Date.now() < end) {
-        requestAnimationFrame(frame);
-      }
-    };
-
-    frame();
-  };
-
-  const checkWhitelist = async () => {
-    setError("");
-    setStatus(null);
-    setShowModal(false);
-    
-    if (!wallet.startsWith('0x') || wallet.length !== 42) {
-      setError("Invalid wallet address format");
-      return;
-    }
-
-    setLoading(true);
-
-    try {
-      const response = await fetch('/api/check-wallet', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ wallet })
-      });
-
-      const data = await response.json();
-      
-      if (data.error) {
-        setError(data.error);
-      } else {
-        setStatus(data.status);
-        
-        if (data.status !== 'NONE') {
-          setShowModal(true);
-          fireConfetti();
-        }
-      }
-    } catch (err) {
-      setError("Failed to check wallet. Please try again.");
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  // Helper function to check which badges to show
-  const shouldShowBadge = (badge: 'OG' | 'GTD' | 'WL') => {
-    if (!status || status === 'NONE') return false;
-    
-    if (status === 'ALL') return true;
-    
-    if (badge === 'OG') return status === 'OG' || status.includes('OG');
-    if (badge === 'GTD') return status === 'GTD' || status.includes('GTD');
-    if (badge === 'WL') return status === 'WL' || status.includes('WL');
-    
-    return false;
-  };
+  const menuItems = [
+    { name: "About", href: "/about" },
+    { name: "Lore", href: "/lore" },
+    { name: "Arcade", href: "/arcade" },
+    { name: "Shacko Pump", href: "/shacko-pump" },
+    { name: "Theatre", href: "/theatre" },
+    { name: "Staking", href: "/staking" },
+    { name: "Rewards", href: "/rewards" },
+    { name: "Community", href: "/community" },
+    { name: "Store", href: "#shop" },
+    { name: "FAQ", href: "/faq" },
+    { name: "Socials", href: "#socials" },
+  ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-[#0ea5e9] via-[#38bdf8] to-[#7dd3fc] selection:bg-[#ec4899] selection:text-white overflow-x-hidden">
-      <FloatingSharks />
-      
-      {/* Success Modal */}
+    <>
+      {/* Menu Button */}
+      <button
+        onClick={() => setIsOpen(true)}
+        className="p-2 text-white hover:text-gray-200 transition-colors"
+        aria-label="Open menu"
+      >
+        <Menu size={28} strokeWidth={2.5} />
+      </button>
+
+      {/* Full-Screen Menu Overlay */}
       <AnimatePresence>
-        {showModal && status && status !== 'NONE' && (
+        {isOpen && (
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 backdrop-blur-sm p-4"
-            onClick={() => setShowModal(false)}
+            transition={{ duration: 0.2 }}
+            className="fixed inset-0 bg-[#e5e5e5] z-[100] overflow-y-auto"
           >
-            <motion.div
-              initial={{ scale: 0.5, y: 50 }}
-              animate={{ scale: 1, y: 0 }}
-              exit={{ scale: 0.5, y: 50 }}
-              transition={{ type: "spring", duration: 0.5 }}
-              className="bg-white rounded-3xl border-4 border-black comic-shadow-lg max-w-md w-full p-8 relative"
-              onClick={(e) => e.stopPropagation()}
-            >
-              <button
-                onClick={() => setShowModal(false)}
-                className="absolute top-4 right-4 w-8 h-8 rounded-full bg-black text-white font-bold hover:bg-gray-800"
-              >
-                ✕
-              </button>
+            {/* Fixed Header */}
+            <div className="sticky top-0 bg-[#e5e5e5] z-10">
+              <div className="flex items-center justify-between px-6 h-16 border-b border-gray-300">
+                <span className="text-2xl font-bold tracking-tight text-black">SHACKO</span>
+                <button
+                  onClick={() => setIsOpen(false)}
+                  className="p-2 hover:bg-gray-200 rounded-lg transition-colors"
+                >
+                  <X size={28} strokeWidth={2.5} className="text-black" />
+                </button>
+              </div>
+            </div>
 
-              <div className="flex justify-center mb-6">
-                <img 
-                  src={backShackoImage} 
-                  alt="Success Sharks" 
-                  className="w-48 h-48 object-contain"
-                />
+            {/* Scrollable Menu Content */}
+            <div className="px-6 py-6 pb-24">
+              {/* Connect Wallet Button ONLY - No text */}
+              <div className="mb-8 pb-6 border-b border-gray-300">
+                <ConnectButton />
               </div>
 
-              <h2 className="text-5xl font-[Bangers] text-center text-[#0ea5e9] mb-4 text-stroke-sm">
-                🎉 YOU'RE IN! 🎉
-              </h2>
+              {/* Menu Items */}
+              <nav className="space-y-0">
+                {menuItems.map((item, index) => (
+                  <motion.div
+                    key={item.name}
+                    initial={{ opacity: 0, x: -20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: index * 0.03 }}
+                  >
+                    <a
+                      href={item.href}
+                      onClick={() => setIsOpen(false)}
+                      className="flex items-center justify-between py-3 text-lg font-bold text-black hover:text-gray-600 transition-colors border-b border-gray-200 uppercase tracking-tight"
+                    >
+                      <span>{item.name}</span>
+                      <span className="text-gray-400">→</span>
+                    </a>
+                  </motion.div>
+                ))}
+              </nav>
 
-              <div className="flex justify-center gap-3 flex-wrap mb-6">
-                {/* OG Badge */}
-                {shouldShowBadge('OG') && (
-                  <motion.div
-                    initial={{ scale: 0 }}
-                    animate={{ scale: 1 }}
-                    transition={{ delay: 0.2, type: "spring" }}
-                    className="bg-gradient-to-r from-yellow-400 to-orange-500 text-black px-6 py-3 rounded-xl font-[Bangers] text-2xl border-3 border-black comic-shadow"
-                  >
-                    👑 OG PHASE
-                  </motion.div>
-                )}
-                
-                {/* GTD Badge */}
-                {shouldShowBadge('GTD') && (
-                  <motion.div
-                    initial={{ scale: 0 }}
-                    animate={{ scale: 1 }}
-                    transition={{ delay: 0.4, type: "spring" }}
-                    className="bg-gradient-to-r from-blue-400 to-cyan-500 text-black px-6 py-3 rounded-xl font-[Bangers] text-2xl border-3 border-black comic-shadow"
-                  >
-                    💎 GTD PHASE
-                  </motion.div>
-                )}
-                
-                {/* WL Badge */}
-                {shouldShowBadge('WL') && (
-                  <motion.div
-                    initial={{ scale: 0 }}
-                    animate={{ scale: 1 }}
-                    transition={{ delay: 0.6, type: "spring" }}
-                    className="bg-gradient-to-r from-green-400 to-teal-500 text-black px-6 py-3 rounded-xl font-[Bangers] text-2xl border-3 border-black comic-shadow"
-                  >
-                    🎟️ WL PHASE
-                  </motion.div>
-                )}
+              {/* Footer */}
+              <div className="mt-10 pt-6 border-t border-gray-300">
+                <a href="/license" className="block text-xs text-gray-500 uppercase tracking-wider mb-2 hover:text-gray-700">
+                  License
+                </a>
+                <a href="/terms" className="block text-xs text-gray-500 uppercase tracking-wider mb-6 hover:text-gray-700">
+                  Terms & Conditions
+                </a>
+                <p className="text-xs text-gray-500 mb-1">SHACKO LABS, INC © 2026</p>
+                <p className="text-xs text-gray-500 mb-1">MADE WITH ❤️ ON BASE</p>
+                <p className="text-xs text-gray-500">HELLO@SHACKO.XYZ</p>
               </div>
-
-              <p className="text-center text-gray-600 font-[Fredoka] text-lg mb-6">
-                You're officially on the Shark List! Get ready to chomp! 🦈
-              </p>
-
-              <ComicButton 
-                onClick={() => setShowModal(false)}
-                className="w-full"
-                size="lg"
-              >
-                AWESOME!
-              </ComicButton>
-            </motion.div>
+            </div>
           </motion.div>
         )}
       </AnimatePresence>
-
-      {/* Navbar - Azuki Style */}
-      <nav className="fixed top-0 w-full z-50 bg-[#0ea5e9]/90 backdrop-blur-md border-b-4 border-black">
-        <div className="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
-          {/* Left - SHACKO Text (no logo) */}
-          <span className="text-4xl font-bold tracking-tight text-white">
-            SHACKO
-          </span>
-          
-          {/* Right - Desktop Nav + Menu */}
-          <div className="flex items-center gap-6">
-            {/* Desktop Links (hidden on mobile) */}
-            <div className="hidden lg:flex items-center gap-8">
-              <a href="/about" className="text-white font-semibold hover:text-gray-200 transition-colors">About</a>
-              <a href="/staking" className="text-white font-semibold hover:text-gray-200 transition-colors">Beanz</a>
-              <a href="/rewards" className="text-white font-semibold hover:text-gray-200 transition-colors">Lore</a>
-              <div className="hidden md:block">
-                <ConnectButton />
-              </div>
-            </div>
-            
-            {/* Menu Button (always visible) */}
-            <MobileMenu />
-          </div>
-        </div>
-      </nav>
-
-      {/* Hero Section */}
-      <section className="relative pt-28 pb-8 px-6 min-h-screen flex flex-col items-center justify-center">
-        <motion.div 
-          initial={{ y: -50, opacity: 0 }}
-          animate={{ y: 0, opacity: 1 }}
-          transition={{ duration: 0.6 }}
-          className="text-center z-10 mb-4"
-        >
-          <h1 className="text-[4rem] sm:text-[6rem] md:text-[8rem] lg:text-[10rem] font-[Bangers] text-white leading-[0.85] tracking-tight">
-            <span className="block text-stroke">CHOMP.</span>
-            <span className="block text-stroke">COLLECT.</span>
-            <span className="block text-[#1e3a5f] text-stroke">SHACKO.</span>
-          </h1>
-        </motion.div>
-
-        <motion.div
-          initial={{ y: 100, opacity: 0 }}
-          animate={{ y: 0, opacity: 1 }}
-          transition={{ duration: 0.8, delay: 0.3 }}
-          className="relative z-10 w-full max-w-4xl mx-auto"
-        >
-          <img
-            src={heroImage}
-            alt="Shacko Characters"
-            className="w-full h-auto object-contain drop-shadow-2xl"
-          />
-        </motion.div>
-
-        <motion.div 
-          className="mt-8 z-10"
-          animate={{ y: [0, 10, 0] }}
-          transition={{ duration: 1.5, repeat: Infinity }}
-        >
-          <ComicButton size="lg" onClick={scrollToVibes}>
-            Explore the Ocean
-          </ComicButton>
-        </motion.div>
-      </section>
-
-      {/* Marquee Banner */}
-      <div className="bg-[#1e293b] border-y-4 border-black py-4 overflow-hidden">
-        <motion.div
-          animate={{ x: ["0%", "-50%"] }}
-          transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
-          className="flex whitespace-nowrap"
-        >
-          {[...Array(10)].map((_, i) => (
-            <span key={i} className="text-3xl font-[Bangers] text-white mx-8">
-              THE CHOMP NEVER ENDS <span className="text-[#38bdf8]">SHACKO</span>
-            </span>
-          ))}
-        </motion.div>
-      </div>
-
-      {/* Wallet Check Section */}
-      <section id="whitelist-checker" className="relative py-32 bg-[#0ea5e9] border-y-4 border-black overflow-hidden">
-        <div className="absolute inset-0 opacity-10" 
-             style={{ backgroundImage: 'radial-gradient(circle, #ffffff 2px, transparent 2px)', backgroundSize: '30px 30px' }} 
-        />
-        
-        <div className="max-w-3xl mx-auto px-6 relative z-10">
-          <motion.div
-            initial={{ scale: 0.9, opacity: 0 }}
-            whileInView={{ scale: 1, opacity: 1 }}
-            className="bg-white border-4 border-black rounded-3xl p-10 comic-shadow text-center"
-          >
-            <h2 className="text-6xl font-[Bangers] text-[#0ea5e9] text-stroke mb-4 uppercase">CHECK THE LIST</h2>
-            <p className="text-xl font-bold mb-8 text-slate-700">Are you OG, GTD, or WL? Paste your wallet below!</p>
-            
-            <div className="space-y-4">
-              <input 
-                type="text" 
-                value={wallet}
-                onChange={(e) => setWallet(e.target.value)}
-                placeholder="0x..." 
-                className="w-full h-16 rounded-xl border-4 border-black px-6 text-xl font-mono focus:ring-4 focus:ring-[#ec4899]/30 outline-none transition-all"
-              />
-              
-              {error && (
-                <p className="text-red-500 font-bold">{error}</p>
-              )}
-              
-              <ComicButton 
-                size="lg" 
-                variant="accent" 
-                className="w-full" 
-                onClick={checkWhitelist}
-                disabled={loading}
-              >
-                {loading ? "CHECKING..." : "Verify Status"}
-              </ComicButton>
-            </div>
-            
-            {status === 'NONE' && (
-              <motion.div 
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                className="mt-8 p-6 rounded-2xl border-4 border-black bg-red-50"
-              >
-                <p className="font-[Bangers] text-4xl text-slate-400">NOT ON LIST YET... 💨</p>
-                <p className="text-gray-600 mt-2">Keep swimming! Future opportunities await.</p>
-              </motion.div>
-            )}
-          </motion.div>
-        </div>
-      </section>
-
-      <div id="vibes">
-        <GalleryGrid />
-      </div>
-
-      <Footer />
-    </div>
+    </>
   );
 }
