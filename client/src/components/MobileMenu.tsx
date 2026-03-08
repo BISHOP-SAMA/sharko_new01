@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Menu, X } from "lucide-react"; // ← Menu is back!
+import { Menu, X } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { ConnectButton } from '@rainbow-me/rainbowkit';
 
@@ -22,16 +22,16 @@ export function MobileMenu() {
 
   return (
     <>
-      {/* Menu Button */}
+      {/* Menu Button - Always visible */}
       <button
         onClick={() => setIsOpen(true)}
-        className="p-2 text-white hover:text-gray-200 transition-colors"
+        className="p-2 text-white hover:text-gray-200 transition-colors z-50"
         aria-label="Open menu"
       >
         <Menu size={28} strokeWidth={2.5} />
       </button>
 
-      {/* Full-Screen Menu Overlay */}
+      {/* Full-Screen Menu Overlay - Starts below navbar */}
       <AnimatePresence>
         {isOpen && (
           <motion.div
@@ -39,15 +39,16 @@ export function MobileMenu() {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.2 }}
-            className="fixed inset-0 bg-[#e5e5e5] z-[100] overflow-y-auto"
+            className="fixed top-20 left-0 right-0 bottom-0 bg-[#e5e5e5] z-[100] overflow-y-auto"
           >
-            {/* Fixed Header */}
+            {/* Header with X button */}
             <div className="sticky top-0 bg-[#e5e5e5] z-10">
               <div className="flex items-center justify-between px-6 h-16 border-b border-gray-300">
                 <span className="text-2xl font-bold tracking-tight text-black">SHACKO</span>
                 <button
                   onClick={() => setIsOpen(false)}
                   className="p-2 hover:bg-gray-200 rounded-lg transition-colors"
+                  aria-label="Close menu"
                 >
                   <X size={28} strokeWidth={2.5} className="text-black" />
                 </button>
