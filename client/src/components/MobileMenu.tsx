@@ -1,89 +1,93 @@
+"use client";
+
 import { useState } from "react";
 import { Menu, X } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
-import { ConnectButton } from '@rainbow-me/rainbowkit';
+import { ConnectButton } from "@rainbow-me/rainbowkit";
 
-export function MobileMenu() {
-  const [isOpen, setIsOpen] = useState(false);
+export default function MobileNav() {
+  const [open, setOpen] = useState(false);
 
-  const menuItems = [
-    { name: "About", href: "/about" },
-    { name: "Lore", href: "/lore" },
-    { name: "Arcade", href: "/arcade" },
-    { name: "Shacko Pump", href: "/shacko-pump" },
-    { name: "Theatre", href: "/theatre" },
-    { name: "Staking", href: "/staking" },
-    { name: "Rewards", href: "/rewards" },
-    { name: "Community", href: "/community" },
-    { name: "Store", href: "#shop" },
-    { name: "FAQ", href: "/faq" },
-    { name: "Socials", href: "#socials" },
+  const links = [
+    { label: "About", href: "/about" },
+    { label: "Lore", href: "/lore" },
+    { label: "Arcade", href: "/arcade" },
+    { label: "Shacko Pump", href: "/shacko-pump" },
+    { label: "Theatre", href: "/theatre" },
+    { label: "Staking", href: "/staking" },
+    { label: "Rewards", href: "/rewards" },
+    { label: "Community", href: "/community" },
+    { label: "Store", href: "/shop" },
+    { label: "FAQ", href: "/faq" },
+    { label: "Socials", href: "/socials" },
   ];
 
   return (
     <>
-      {/* Hamburger button on main page */}
+      {/* Hamburger button – only on mobile */}
       <button
-        onClick={() => setIsOpen(true)}
-        className="p-2 text-white hover:text-gray-200 transition-colors"
-        aria-label="Open menu"
+        type="button"
+        onClick={() => setOpen(true)}
+        className="md:hidden p-2 text-white hover:text-blue-300 transition-colors"
+        aria-label="Open navigation menu"
       >
         <Menu size={28} strokeWidth={2.5} />
       </button>
 
       <AnimatePresence>
-        {isOpen && (
+        {open && (
           <>
-            {/* Backdrop – semi-transparent so hero is visible underneath */}
+            {/* Backdrop – click to close, blurs hero */}
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              className="fixed inset-0 bg-black/40 backdrop-blur-sm z-[99]"
-              onClick={() => setIsOpen(false)} // close on backdrop click
+              transition={{ duration: 0.25 }}
+              className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[999]"
+              onClick={() => setOpen(false)}
             />
 
-            {/* Side panel slide-in from right – starts near top */}
+            {/* Side panel */}
             <motion.div
               initial={{ x: "100%" }}
               animate={{ x: 0 }}
               exit={{ x: "100%" }}
-              transition={{ type: "spring", damping: 25, stiffness: 200 }}
-              className="fixed right-0 top-0 h-full w-4/5 max-w-sm bg-gradient-to-b from-[#001f3f] to-[#000814] z-[100] overflow-y-auto shadow-2xl"
+              transition={{ type: "spring", damping: 28, stiffness: 300 }}
+              className="fixed right-0 top-0 h-full w-4/5 max-w-[360px] bg-gradient-to-b from-[#001122] to-[#000814] z-[1000] overflow-y-auto"
             >
-              {/* Close button – floating top-right, no full header bar */}
+              {/* Close button */}
               <button
-                onClick={() => setIsOpen(false)}
-                className="absolute top-5 right-5 p-2 text-white hover:text-blue-300 transition-colors z-10"
-                aria-label="Close menu"
+                onClick={() => setOpen(false)}
+                className="absolute top-6 right-6 z-10 text-white hover:text-blue-300 transition-colors p-2"
+                aria-label="Close navigation menu"
               >
                 <X size={32} strokeWidth={2.5} />
               </button>
 
-              {/* Content starts near top – small padding only */}
-              <div className="pt-20 px-6 pb-10"> {/* pt-20 gives space under close button */}
-                {/* Connect Wallet – prominent */}
+              {/* Content */}
+              <div className="pt-20 px-6 pb-10">
+                {/* Connect Wallet */}
                 <div className="mb-10">
-                  <h3 className="text-blue-300 font-bold text-lg uppercase tracking-wider mb-4">
+                  <div className="text-blue-300 uppercase font-semibold tracking-wide text-base mb-4">
                     Connect Wallet
-                  </h3>
+                  </div>
                   <ConnectButton />
                 </div>
 
-                {/* Menu items – clean, spaced, with arrow */}
-                <nav className="space-y-6">
-                  {menuItems.map((item, index) => (
+                {/* Links */}
+                <nav className="flex flex-col gap-5">
+                  {links.map((item, i) => (
                     <motion.a
-                      key={item.name}
+                      key={item.label}
                       href={item.href}
-                      onClick={() => setIsOpen(false)}
-                      initial={{ opacity: 0, x: -20 }}
+                      onClick={() => setOpen(false)}
+                      initial={{ opacity: 0, x: -16 }}
                       animate={{ opacity: 1, x: 0 }}
-                      transition={{ delay: index * 0.05 }}
-                      className="block text-2xl font-bold uppercase tracking-wide text-white hover:text-blue-300 transition-colors flex items-center justify-between"
+                      transition={{ delay: i * 0.04 + 0.1 }}
+                      className="text-white text-xl font-bold uppercase tracking-wide hover:text-blue-300 transition-colors flex items-center justify-between"
                     >
-                      {item.name}
-                      <span className="text-blue-500 text-3xl">→</span>
+                      {item.label}
+                      <span className="text-blue-500 opacity-70 text-2xl">→</span>
                     </motion.a>
                   ))}
                 </nav>
