@@ -1,17 +1,19 @@
+"use client";
+
 import { GalleryGrid } from "@/components/GalleryGrid";
 import { FloatingSharks } from "@/components/FloatingSharks";
-import { MobileMenu } from "@/components/MobileMenu";
+import MobileMenu from "@/components/MobileMenu"; // ← FIXED: default import (no curly braces)
 import { Footer } from "@/components/Footer";
 import { motion, AnimatePresence } from "framer-motion";
 import { ComicButton } from "@/components/ui/comic-button";
-import { ConnectButton } from '@rainbow-me/rainbowkit';
+import { ConnectButton } from "@rainbow-me/rainbowkit";
 import { useState } from "react";
 import confetti from "canvas-confetti";
 import heroImage from "@assets/hero-shark.png";
 import backShackoImage from "@assets/back-shacko.png";
 
 // Updated status type to include WL and combinations
-type WhitelistStatus = 'OG' | 'GTD' | 'WL' | 'OG+GTD' | 'OG+WL' | 'GTD+WL' | 'ALL' | 'NONE';
+type WhitelistStatus = "OG" | "GTD" | "WL" | "OG+GTD" | "OG+WL" | "GTD+WL" | "ALL" | "NONE";
 
 export default function Home() {
   const [wallet, setWallet] = useState("");
@@ -21,7 +23,7 @@ export default function Home() {
   const [showModal, setShowModal] = useState(false);
 
   const scrollToVibes = () => {
-    document.getElementById('vibes')?.scrollIntoView({ behavior: 'smooth' });
+    document.getElementById("vibes")?.scrollIntoView({ behavior: "smooth" });
   };
 
   const fireConfetti = () => {
@@ -34,14 +36,14 @@ export default function Home() {
         angle: 60,
         spread: 55,
         origin: { x: 0 },
-        colors: ['#0ea5e9', '#38bdf8', '#ec4899', '#fbbf24']
+        colors: ["#0ea5e9", "#38bdf8", "#ec4899", "#fbbf24"],
       });
       confetti({
         particleCount: 3,
         angle: 120,
         spread: 55,
         origin: { x: 1 },
-        colors: ['#0ea5e9', '#38bdf8', '#ec4899', '#fbbf24']
+        colors: ["#0ea5e9", "#38bdf8", "#ec4899", "#fbbf24"],
       });
 
       if (Date.now() < end) {
@@ -56,8 +58,8 @@ export default function Home() {
     setError("");
     setStatus(null);
     setShowModal(false);
-    
-    if (!wallet.startsWith('0x') || wallet.length !== 42) {
+
+    if (!wallet.startsWith("0x") || wallet.length !== 42) {
       setError("Invalid wallet address format");
       return;
     }
@@ -65,20 +67,20 @@ export default function Home() {
     setLoading(true);
 
     try {
-      const response = await fetch('/api/check-wallet', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ wallet })
+      const response = await fetch("/api/check-wallet", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ wallet }),
       });
 
       const data = await response.json();
-      
+
       if (data.error) {
         setError(data.error);
       } else {
         setStatus(data.status);
-        
-        if (data.status !== 'NONE') {
+
+        if (data.status !== "NONE") {
           setShowModal(true);
           fireConfetti();
         }
@@ -91,25 +93,25 @@ export default function Home() {
   };
 
   // Helper function to check which badges to show
-  const shouldShowBadge = (badge: 'OG' | 'GTD' | 'WL') => {
-    if (!status || status === 'NONE') return false;
-    
-    if (status === 'ALL') return true;
-    
-    if (badge === 'OG') return status === 'OG' || status.includes('OG');
-    if (badge === 'GTD') return status === 'GTD' || status.includes('GTD');
-    if (badge === 'WL') return status === 'WL' || status.includes('WL');
-    
+  const shouldShowBadge = (badge: "OG" | "GTD" | "WL") => {
+    if (!status || status === "NONE") return false;
+
+    if (status === "ALL") return true;
+
+    if (badge === "OG") return status === "OG" || status.includes("OG");
+    if (badge === "GTD") return status === "GTD" || status.includes("GTD");
+    if (badge === "WL") return status === "WL" || status.includes("WL");
+
     return false;
   };
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-[#0ea5e9] via-[#38bdf8] to-[#7dd3fc] selection:bg-[#ec4899] selection:text-white overflow-x-hidden">
       <FloatingSharks />
-      
+
       {/* Success Modal */}
       <AnimatePresence>
-        {showModal && status && status !== 'NONE' && (
+        {showModal && status && status !== "NONE" && (
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -133,9 +135,9 @@ export default function Home() {
               </button>
 
               <div className="flex justify-center mb-6">
-                <img 
-                  src={backShackoImage} 
-                  alt="Success Sharks" 
+                <img
+                  src={backShackoImage}
+                  alt="Success Sharks"
                   className="w-48 h-48 object-contain"
                 />
               </div>
@@ -146,7 +148,7 @@ export default function Home() {
 
               <div className="flex justify-center gap-3 flex-wrap mb-6">
                 {/* OG Badge */}
-                {shouldShowBadge('OG') && (
+                {shouldShowBadge("OG") && (
                   <motion.div
                     initial={{ scale: 0 }}
                     animate={{ scale: 1 }}
@@ -156,9 +158,9 @@ export default function Home() {
                     👑 OG PHASE
                   </motion.div>
                 )}
-                
+
                 {/* GTD Badge */}
-                {shouldShowBadge('GTD') && (
+                {shouldShowBadge("GTD") && (
                   <motion.div
                     initial={{ scale: 0 }}
                     animate={{ scale: 1 }}
@@ -168,9 +170,9 @@ export default function Home() {
                     💎 GTD PHASE
                   </motion.div>
                 )}
-                
+
                 {/* WL Badge */}
-                {shouldShowBadge('WL') && (
+                {shouldShowBadge("WL") && (
                   <motion.div
                     initial={{ scale: 0 }}
                     animate={{ scale: 1 }}
@@ -186,11 +188,7 @@ export default function Home() {
                 You're officially on the Shark List! Get ready to chomp! 🦈
               </p>
 
-              <ComicButton 
-                onClick={() => setShowModal(false)}
-                className="w-full"
-                size="lg"
-              >
+              <ComicButton onClick={() => setShowModal(false)} className="w-full" size="lg">
                 AWESOME!
               </ComicButton>
             </motion.div>
@@ -202,18 +200,16 @@ export default function Home() {
       <nav className="fixed top-0 w-full z-50 bg-[#0ea5e9]/90 backdrop-blur-md border-b-4 border-black">
         <div className="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
           {/* Left - SHACKO Text (no logo) */}
-          <span className="text-4xl font-bold tracking-tight text-white">
-            SHACKO
-          </span>
-          
-          {/* Right - Menu Button */}
+          <span className="text-4xl font-bold tracking-tight text-white">SHACKO</span>
+
+          {/* Right - Mobile Menu (hamburger) */}
           <MobileMenu />
         </div>
       </nav>
 
       {/* Hero Section */}
       <section className="relative pt-28 pb-8 px-6 min-h-screen flex flex-col items-center justify-center">
-        <motion.div 
+        <motion.div
           initial={{ y: -50, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           transition={{ duration: 0.6 }}
@@ -239,7 +235,7 @@ export default function Home() {
           />
         </motion.div>
 
-        <motion.div 
+        <motion.div
           className="mt-8 z-10"
           animate={{ y: [0, 10, 0] }}
           transition={{ duration: 1.5, repeat: Infinity }}
@@ -266,46 +262,55 @@ export default function Home() {
       </div>
 
       {/* Wallet Check Section */}
-      <section id="whitelist-checker" className="relative py-32 bg-[#0ea5e9] border-y-4 border-black overflow-hidden">
-        <div className="absolute inset-0 opacity-10" 
-             style={{ backgroundImage: 'radial-gradient(circle, #ffffff 2px, transparent 2px)', backgroundSize: '30px 30px' }} 
+      <section
+        id="whitelist-checker"
+        className="relative py-32 bg-[#0ea5e9] border-y-4 border-black overflow-hidden"
+      >
+        <div
+          className="absolute inset-0 opacity-10"
+          style={{
+            backgroundImage: "radial-gradient(circle, #ffffff 2px, transparent 2px)",
+            backgroundSize: "30px 30px",
+          }}
         />
-        
+
         <div className="max-w-3xl mx-auto px-6 relative z-10">
           <motion.div
             initial={{ scale: 0.9, opacity: 0 }}
             whileInView={{ scale: 1, opacity: 1 }}
             className="bg-white border-4 border-black rounded-3xl p-10 comic-shadow text-center"
           >
-            <h2 className="text-6xl font-[Bangers] text-[#0ea5e9] text-stroke mb-4 uppercase">CHECK THE LIST</h2>
-            <p className="text-xl font-bold mb-8 text-slate-700">Are you OG, GTD, or WL? Paste your wallet below!</p>
-            
+            <h2 className="text-6xl font-[Bangers] text-[#0ea5e9] text-stroke mb-4 uppercase">
+              CHECK THE LIST
+            </h2>
+            <p className="text-xl font-bold mb-8 text-slate-700">
+              Are you OG, GTD, or WL? Paste your wallet below!
+            </p>
+
             <div className="space-y-4">
-              <input 
-                type="text" 
+              <input
+                type="text"
                 value={wallet}
                 onChange={(e) => setWallet(e.target.value)}
-                placeholder="0x..." 
+                placeholder="0x..."
                 className="w-full h-16 rounded-xl border-4 border-black px-6 text-xl font-mono focus:ring-4 focus:ring-[#ec4899]/30 outline-none transition-all"
               />
-              
-              {error && (
-                <p className="text-red-500 font-bold">{error}</p>
-              )}
-              
-              <ComicButton 
-                size="lg" 
-                variant="accent" 
-                className="w-full" 
+
+              {error && <p className="text-red-500 font-bold">{error}</p>}
+
+              <ComicButton
+                size="lg"
+                variant="accent"
+                className="w-full"
                 onClick={checkWhitelist}
                 disabled={loading}
               >
                 {loading ? "CHECKING..." : "Verify Status"}
               </ComicButton>
             </div>
-            
-            {status === 'NONE' && (
-              <motion.div 
+
+            {status === "NONE" && (
+              <motion.div
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 className="mt-8 p-6 rounded-2xl border-4 border-black bg-red-50"
