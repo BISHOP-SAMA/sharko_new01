@@ -2,6 +2,7 @@
 
 import { motion, AnimatePresence } from "framer-motion";
 import { ConnectButton } from "@rainbow-me/rainbowkit";
+import Link from "next/link";
 
 interface MobileMenuProps {
   isOpen: boolean;
@@ -17,68 +18,68 @@ export default function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
     { label: "Theatre", href: "/theatre" },
     { label: "Staking", href: "/staking" },
     { label: "Rewards", href: "/rewards" },
-    { label: "Community", href: "/community" },
     { label: "Store", href: "/shop" },
     { label: "FAQ", href: "/faq" },
-    { label: "Socials", href: "/socials" },
   ];
 
   return (
     <AnimatePresence>
       {isOpen && (
         <>
-          {/* Backdrop */}
+          {/* 1. Backdrop: Fades in to dim the page content */}
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            transition={{ duration: 0.2 }}
-            className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[999]"
+            className="fixed inset-0 bg-black/50 backdrop-blur-sm z-[40]"
             onClick={onClose}
           />
 
-          {/* White panel - BELOW navbar */}
+          {/* 2. Menu Panel: Slides down from behind the h-20 Navbar */}
           <motion.div
-            initial={{ x: "100%" }}
-            animate={{ x: 0 }}
-            exit={{ x: "100%" }}
-            transition={{ type: "spring", damping: 28, stiffness: 300 }}
-            className="fixed right-0 top-20 bottom-0 w-full max-w-md bg-white z-[1000] overflow-y-auto shadow-2xl"
+            initial={{ y: "-100%" }}
+            animate={{ y: 0 }}
+            exit={{ y: "-100%" }}
+            transition={{ type: "spring", damping: 25, stiffness: 200 }}
+            className="fixed left-0 right-0 top-20 bottom-0 bg-[#0ea5e9] z-[45] overflow-y-auto border-t-4 border-black flex flex-col"
           >
-            {/* Menu content */}
-            <div className="px-6 py-8">
-              {/* Connect Wallet */}
-              <div className="mb-8 pb-6 border-b border-gray-200">
-                <ConnectButton />
+            <div className="p-6 flex flex-col h-full">
+              
+              {/* Wallet Section: Boxed with the Shacko shadow style */}
+              <div className="mb-8 p-4 bg-white border-4 border-black shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] inline-block w-fit">
+                <ConnectButton accountStatus="address" showBalance={false} />
               </div>
 
-              {/* Navigation links */}
-              <nav className="flex flex-col gap-0">
-                {links.map((item, i) => (
-                  <motion.a
-                    key={item.label}
-                    href={item.href}
-                    onClick={onClose}
+              {/* Navigation: Bold, Italic, and Uppercase */}
+              <nav className="flex flex-col space-y-2">
+                {links.map((link, i) => (
+                  <motion.div
+                    key={link.label}
                     initial={{ opacity: 0, x: -20 }}
                     animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: i * 0.05 + 0.15 }}
-                    className="group flex items-center justify-between py-4 text-xl font-bold text-black uppercase tracking-tight hover:text-gray-600 transition-colors border-b border-gray-100"
+                    transition={{ delay: i * 0.05 }}
                   >
-                    <span>{item.label}</span>
-                    <span className="text-gray-400 text-2xl transform group-hover:translate-x-1 transition-transform">
-                      →
-                    </span>
-                  </motion.a>
+                    <Link
+                      href={link.href}
+                      onClick={onClose}
+                      className="text-4xl font-black italic uppercase text-white hover:text-black transition-colors py-2 block drop-shadow-[2px_2px_0px_rgba(0,0,0,1)]"
+                    >
+                      {link.label}
+                    </Link>
+                  </motion.div>
                 ))}
               </nav>
 
-              {/* Footer */}
-              <div className="mt-12 pt-8 border-t border-gray-200">
-                <p className="text-xs text-gray-400 uppercase tracking-wider mb-2">License</p>
-                <p className="text-xs text-gray-400 uppercase tracking-wider mb-6">Terms & Conditions</p>
-                <p className="text-xs text-gray-500 mb-1">SHACKO LABS, INC © 2026</p>
-                <p className="text-xs text-gray-500 mb-1">MADE WITH ❤️ ON BASE</p>
-                <p className="text-xs text-gray-500">HELLO@SHACKO.XYZ</p>
+              {/* Footer: Matches the Napo/Shacko license style */}
+              <div className="mt-auto pt-10 border-t-4 border-black/20">
+                <p className="text-black font-black italic uppercase text-lg mb-4">
+                  THE CHOMP NEVER ENDS
+                </p>
+                <div className="text-[10px] font-bold text-white uppercase tracking-[0.2em] space-y-1 opacity-80">
+                  <p>SHACKO LABS, INC © 2026</p>
+                  <p>MADE ON BASE 🔵</p>
+                  <p>HELLO@SHACKO.XYZ</p>
+                </div>
               </div>
             </div>
           </motion.div>
