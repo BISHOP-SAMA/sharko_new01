@@ -1,37 +1,22 @@
-import { motion, AnimatePresence } from "framer-motion";
-import { Link } from "wouter"; // Matches your package.json
+// client/src/components/MobileMenu.tsx
+import { Link } from "wouter";
 
-interface MobileMenuProps {
-  isOpen: boolean;
-  onClose: () => void;
-}
+const menuLinks = [
+  { name: "Home", path: "/" },
+  { name: "Raffles", path: "/raffle" },
+  { name: "Staking", path: "/staking" },
+  { name: "Arcade", path: "/arcade" },
+  { name: "Shop", path: "/shop" },
+  { name: "Theatre", path: "/theatre" },
+  { name: "Lore", path: "/lore" },
+  { name: "About", path: "/about" },
+];
 
-export default function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
-  const links = [
-    { label: "About", href: "/about" },
-    { label: "Lore", href: "/lore" },
-    { label: "Arcade", href: "/arcade" },
-    { label: "Staking", href: "/staking" },
-  ];
-
-  return (
-    <AnimatePresence>
-      {isOpen && (
-        <motion.div
-          initial={{ y: "-100%" }}
-          animate={{ y: 0 }}
-          exit={{ y: "-100%" }}
-          className="fixed inset-0 bg-[#0ea5e9] z-[90] pt-24 px-6 flex flex-col"
-        >
-          {links.map((link) => (
-            <Link key={link.label} href={link.href}>
-              <a onClick={onClose} className="text-5xl font-black italic text-white uppercase py-4 border-b-2 border-black/10">
-                {link.label}
-              </a>
-            </Link>
-          ))}
-        </motion.div>
-      )}
-    </AnimatePresence>
-  );
-}
+// Inside your MobileMenu return...
+{menuLinks.map((link) => (
+  <Link key={link.path} href={link.path}>
+    <a className="text-5xl font-[Bangers] italic text-white uppercase py-2 hover:text-[#fbbf24] transition-colors border-b-2 border-white/10 w-full text-center">
+      {link.name}
+    </a>
+  </Link>
+))}
