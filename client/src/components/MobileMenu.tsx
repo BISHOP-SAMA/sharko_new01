@@ -2,8 +2,8 @@
 
 import { motion, AnimatePresence } from "framer-motion";
 import { ConnectButton } from "@rainbow-me/rainbowkit";
-// 1. CHANGE THIS IMPORT:
-import { Link } from "react-router-dom"; 
+// 1. FIXED: Using 'wouter' instead of 'react-router-dom'
+import { Link } from "wouter"; 
 
 interface MobileMenuProps {
   isOpen: boolean;
@@ -11,6 +11,7 @@ interface MobileMenuProps {
 }
 
 export default function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
+  // Updated links to match your actual files (About.tsx, Arcade.tsx, etc.)
   const links = [
     { label: "About", href: "/about" },
     { label: "Lore", href: "/lore" },
@@ -46,7 +47,7 @@ export default function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
           >
             <div className="p-6 flex flex-col h-full">
               
-              {/* Wallet Section */}
+              {/* Wallet Section - SHACKO Shadow Style */}
               <div className="mb-8 p-4 bg-white border-4 border-black shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] inline-block w-fit">
                 <ConnectButton accountStatus="address" showBalance={false} />
               </div>
@@ -60,21 +61,22 @@ export default function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ delay: i * 0.05 }}
                   >
-                    {/* 2. ENSURE THIS IS THE REACT ROUTER LINK */}
-                    <Link
-                      to={link.href}
-                      onClick={onClose}
-                      className="text-4xl font-black italic uppercase text-white hover:text-black transition-colors py-2 block drop-shadow-[2px_2px_0px_rgba(0,0,0,1)]"
-                    >
-                      {link.label}
+                    {/* 2. FIXED: wouter uses 'href' prop, not 'to' */}
+                    <Link href={link.href}>
+                      <a 
+                        onClick={onClose}
+                        className="text-4xl font-black italic uppercase text-white hover:text-black transition-colors py-2 block drop-shadow-[2px_2px_0px_rgba(0,0,0,1)]"
+                      >
+                        {link.label}
+                      </a>
                     </Link>
                   </motion.div>
                 ))}
               </nav>
 
-              {/* Footer */}
+              {/* Footer matches the Marquee vibe */}
               <div className="mt-auto pt-10 border-t-4 border-black/20">
-                <p className="text-black font-black italic uppercase text-lg mb-4">
+                <p className="text-black font-black italic uppercase text-lg mb-4 tracking-tighter">
                   THE CHOMP NEVER ENDS
                 </p>
                 <div className="text-[10px] font-bold text-white uppercase tracking-[0.2em] space-y-1 opacity-80">
