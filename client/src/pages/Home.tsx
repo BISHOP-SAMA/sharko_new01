@@ -5,7 +5,6 @@ import { Footer } from "@/components/Footer";
 import { motion, AnimatePresence } from "framer-motion";
 import { ComicButton } from "@/components/ui/comic-button";
 import { ConnectButton } from '@rainbow-me/rainbowkit';
-import { SiX, SiDiscord } from "react-icons/si";
 import { useState } from "react";
 import confetti from "canvas-confetti";
 import heroImage from "@assets/hero-shark.png";
@@ -207,21 +206,8 @@ export default function Home() {
             SHACKO
           </span>
           
-          {/* Right - Desktop Nav + Menu */}
-          <div className="flex items-center gap-6">
-            {/* Desktop Links (hidden on mobile) */}
-            <div className="hidden lg:flex items-center gap-8">
-              <a href="/about" className="text-white font-semibold hover:text-gray-200 transition-colors">About</a>
-              <a href="/staking" className="text-white font-semibold hover:text-gray-200 transition-colors">Beanz</a>
-              <a href="/rewards" className="text-white font-semibold hover:text-gray-200 transition-colors">Lore</a>
-              <div className="hidden md:block">
-                <ConnectButton />
-              </div>
-            </div>
-            
-            {/* Menu Button (always visible) */}
-            <MobileMenu />
-          </div>
+          {/* Right - Menu Button */}
+          <MobileMenu />
         </div>
       </nav>
 
