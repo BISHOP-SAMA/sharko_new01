@@ -9,7 +9,8 @@ export function MobileMenu() {
   const menuItems = [
     { name: "About", href: "/about" },
     { name: "Lore", href: "/lore" },
-    { name: "Arcade", href: "/arcade" },
+    { name: "Raffles", href: "/raffles" },
+    { name: "Shark bank", href: "/shark-bank" },
     { name: "Shacko Pump", href: "/shacko-pump" },
     { name: "Theatre", href: "/theatre" },
     { name: "Staking", href: "/staking" },
