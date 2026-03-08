@@ -8,13 +8,17 @@ export function MobileMenu() {
 
   const menuItems = [
     { name: "About", href: "/about" },
-    { name: "Beanz", href: "/staking" },
-    { name: "Lore", href: "/rewards" },
-    { name: "Community", href: "/faq" },
+    { name: "Lore", href: "/lore" },
+    { name: "Arcade", href: "/arcade" },
+    { name: "Shacko Pump", href: "/shacko-pump" },
+    { name: "Theatre", href: "/theatre" },
+    { name: "Staking", href: "/staking" },
+    { name: "Rewards", href: "/rewards" },
+    { name: "Community", href: "/community" },
+    { name: "Store", href: "#shop" },
+    { name: "FAQ", href: "/faq" },
     { name: "Socials", href: "#socials" },
-    { name: "More", href: "#more" },
-    { name: "Shop", href: "#shop" },
-  ];
+  ]; // ← Fixed: Added closing bracket and semicolon
 
   return (
     <>
