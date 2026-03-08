@@ -4,11 +4,10 @@ import { MobileMenu } from "@/components/MobileMenu";
 import { Footer } from "@/components/Footer";
 import { motion, AnimatePresence } from "framer-motion";
 import { ComicButton } from "@/components/ui/comic-button";
-import { ConnectButton } from '@rainbow-me/rainbowkit'; // ← ADD THIS
+import { ConnectButton } from '@rainbow-me/rainbowkit';
 import { SiX, SiDiscord } from "react-icons/si";
 import { useState } from "react";
 import confetti from "canvas-confetti";
-import logoImage from "@assets/logo-shark.png";
 import heroImage from "@assets/hero-shark.png";
 import backShackoImage from "@assets/back-shacko.png";
 
@@ -200,20 +199,28 @@ export default function Home() {
         )}
       </AnimatePresence>
 
-      {/* Navbar */}
+      {/* Navbar - Azuki Style */}
       <nav className="fixed top-0 w-full z-50 bg-[#0ea5e9]/90 backdrop-blur-md border-b-4 border-black">
         <div className="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
-          <div className="flex items-center gap-4">
-            <MobileMenu />
-            <img src={logoImage} alt="Shacko Logo" className="w-12 h-12 object-contain" />
-            <span className="text-3xl font-[Bangers] text-white text-stroke tracking-widest">
-              SHACKO
-            </span>
-          </div>
+          {/* Left - SHACKO Text (no logo) */}
+          <span className="text-4xl font-bold tracking-tight text-white">
+            SHACKO
+          </span>
           
-          {/* ADD CONNECT BUTTON HERE */}
-          <div className="hidden md:block">
-            <ConnectButton />
+          {/* Right - Desktop Nav + Menu */}
+          <div className="flex items-center gap-6">
+            {/* Desktop Links (hidden on mobile) */}
+            <div className="hidden lg:flex items-center gap-8">
+              <a href="/about" className="text-white font-semibold hover:text-gray-200 transition-colors">About</a>
+              <a href="/staking" className="text-white font-semibold hover:text-gray-200 transition-colors">Beanz</a>
+              <a href="/rewards" className="text-white font-semibold hover:text-gray-200 transition-colors">Lore</a>
+              <div className="hidden md:block">
+                <ConnectButton />
+              </div>
+            </div>
+            
+            {/* Menu Button (always visible) */}
+            <MobileMenu />
           </div>
         </div>
       </nav>
