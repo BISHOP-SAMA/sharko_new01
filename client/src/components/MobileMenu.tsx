@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { X } from "lucide-react"; // Removed Menu since it's not used here
+import { Menu, X } from "lucide-react"; // ← Menu is back!
 import { motion, AnimatePresence } from "framer-motion";
 import { ConnectButton } from '@rainbow-me/rainbowkit';
 
@@ -22,7 +22,7 @@ export function MobileMenu() {
 
   return (
     <>
-      {/* Menu Button (hamburger) – remains on the main page */}
+      {/* Menu Button */}
       <button
         onClick={() => setIsOpen(true)}
         className="p-2 text-white hover:text-gray-200 transition-colors"
@@ -38,29 +38,26 @@ export function MobileMenu() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            transition={{ duration: 0.3 }}
-            className="fixed inset-0 bg-white z-[100] flex flex-col"
+            transition={{ duration: 0.2 }}
+            className="fixed inset-0 bg-[#e5e5e5] z-[100] overflow-y-auto"
           >
-            {/* Minimal Header – just close button + thin black border line */}
-            <div className="sticky top-0 bg-white z-10">
-              <div className="flex items-center justify-end px-6 h-16 border-b border-black">
+            {/* Fixed Header */}
+            <div className="sticky top-0 bg-[#e5e5e5] z-10">
+              <div className="flex items-center justify-between px-6 h-16 border-b border-gray-300">
+                <span className="text-2xl font-bold tracking-tight text-black">SHACKO</span>
                 <button
                   onClick={() => setIsOpen(false)}
-                  className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
-                  aria-label="Close menu"
+                  className="p-2 hover:bg-gray-200 rounded-lg transition-colors"
                 >
                   <X size={28} strokeWidth={2.5} className="text-black" />
                 </button>
               </div>
             </div>
 
-            {/* Menu Content – starts right below the black line */}
-            <div className="flex-1 px-6 py-8 overflow-y-auto">
-              {/* Connect Wallet */}
-              <div className="mb-12 pb-8 border-b border-gray-200">
-                <h3 className="text-red-500 font-bold text-sm mb-4 uppercase tracking-wider">
-                  Connect Wallet
-                </h3>
+            {/* Scrollable Menu Content */}
+            <div className="px-6 py-6 pb-24">
+              {/* Connect Wallet Button ONLY */}
+              <div className="mb-8 pb-6 border-b border-gray-300">
                 <ConnectButton />
               </div>
 
@@ -71,26 +68,30 @@ export function MobileMenu() {
                     key={item.name}
                     initial={{ opacity: 0, x: -20 }}
                     animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: index * 0.05 }}
+                    transition={{ delay: index * 0.03 }}
                   >
                     <a
                       href={item.href}
                       onClick={() => setIsOpen(false)}
-                      className="block py-4 text-2xl font-bold text-black hover:text-gray-600 transition-colors border-b border-gray-100 uppercase tracking-tight"
+                      className="flex items-center justify-between py-3 text-lg font-bold text-black hover:text-gray-600 transition-colors border-b border-gray-200 uppercase tracking-tight"
                     >
-                      {item.name}
-                      <span className="float-right text-gray-400">→</span>
+                      <span>{item.name}</span>
+                      <span className="text-gray-400">→</span>
                     </a>
                   </motion.div>
                 ))}
               </nav>
 
-              {/* Footer – still here, but can be removed if you want full Azuki minimalism */}
-              <div className="mt-12 pt-8 border-t border-gray-200">
-                <p className="text-xs text-gray-400 uppercase tracking-wider mb-2">License</p>
-                <p className="text-xs text-gray-400 uppercase tracking-wider mb-4">Terms & Conditions</p>
-                <p className="text-xs text-gray-500 mt-6">SHACKO LABS, INC © 2026</p>
-                <p className="text-xs text-gray-500">MADE WITH ❤️ ON BASE</p>
+              {/* Footer */}
+              <div className="mt-10 pt-6 border-t border-gray-300">
+                <a href="/license" className="block text-xs text-gray-500 uppercase tracking-wider mb-2 hover:text-gray-700">
+                  License
+                </a>
+                <a href="/terms" className="block text-xs text-gray-500 uppercase tracking-wider mb-6 hover:text-gray-700">
+                  Terms & Conditions
+                </a>
+                <p className="text-xs text-gray-500 mb-1">SHACKO LABS, INC © 2026</p>
+                <p className="text-xs text-gray-500 mb-1">MADE WITH ❤️ ON BASE</p>
                 <p className="text-xs text-gray-500">HELLO@SHACKO.XYZ</p>
               </div>
             </div>
