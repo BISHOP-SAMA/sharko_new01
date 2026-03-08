@@ -24,11 +24,11 @@ export default function MobileMenu() {  // ✅ DEFAULT EXPORT (matches your impo
 
   return (
     <>
-      {/* Hamburger button – always visible */}
+      {/* Hamburger button – fixed position in top right */}
       <button
         type="button"
         onClick={() => setOpen(true)}
-        className="p-2.5 bg-black/20 rounded-lg text-white hover:bg-black/30 transition-colors focus:outline-none focus:ring-2 focus:ring-white"
+        className="fixed top-5 right-6 z-50 p-2.5 bg-black/20 rounded-lg text-white hover:bg-black/30 transition-colors focus:outline-none focus:ring-2 focus:ring-white"
         aria-label="Open navigation menu"
       >
         <Menu size={32} strokeWidth={3} />
@@ -47,27 +47,15 @@ export default function MobileMenu() {  // ✅ DEFAULT EXPORT (matches your impo
               onClick={() => setOpen(false)}
             />
 
-            {/* Full-screen white panel from right */}
+            {/* White panel slides from right - BELOW navbar */}
             <motion.div
               initial={{ x: "100%" }}
               animate={{ x: 0 }}
               exit={{ x: "100%" }}
               transition={{ type: "spring", damping: 28, stiffness: 300 }}
-              className="fixed right-0 top-0 h-full w-full max-w-md bg-white z-[1000] overflow-y-auto shadow-2xl"
+              className="fixed right-0 top-20 bottom-0 w-full max-w-md bg-white z-[1000] overflow-y-auto shadow-2xl"
             >
-              {/* Header with X button */}
-              <div className="flex items-center justify-between px-6 py-6 border-b border-gray-200">
-                <span className="text-2xl font-bold tracking-tight text-black">SHACKO</span>
-                <button
-                  onClick={() => setOpen(false)}
-                  className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
-                  aria-label="Close navigation menu"
-                >
-                  <X size={32} strokeWidth={2.5} className="text-black" />
-                </button>
-              </div>
-
-              {/* Menu content */}
+              {/* Menu content - starts right at top, no header */}
               <div className="px-6 py-8">
                 {/* Connect Wallet button only - no text */}
                 <div className="mb-8 pb-6 border-b border-gray-200">
