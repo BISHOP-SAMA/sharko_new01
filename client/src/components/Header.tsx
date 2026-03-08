@@ -1,5 +1,3 @@
-"use client";
-
 import { useState } from "react";
 import Navbar from "./Navbar";
 import MobileMenu from "./MobileMenu";
@@ -13,13 +11,13 @@ export default function Header() {
 
   return (
     <header className="relative w-full">
-      {/* CRITICAL FIX: Pass 'isOpen' to Navbar so the icon 
-        can switch between <Menu /> and <X /> 
+      {/* Passes the 'isOpen' state to Navbar so the button can 
+        visually toggle between the Hamburger and the 'X' icon.
       */}
       <Navbar onMenuClick={toggleMenu} isOpen={isOpen} />
 
-      {/* The MobileMenu uses top-20 to slide out from 
-        directly behind the h-20 Navbar 
+      {/* Passes 'isOpen' to the menu panel so Framer Motion 
+        can trigger the slide-down animation.
       */}
       <MobileMenu isOpen={isOpen} onClose={closeMenu} />
     </header>
