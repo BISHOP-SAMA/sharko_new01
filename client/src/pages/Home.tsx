@@ -6,9 +6,10 @@ import { Footer } from "@/components/Footer";
 import { ArrowRight } from "lucide-react";
 
 // Import your images
-import heroImage from "@assets/New1.png";
+import heroImage from "@assets/Head.png";
 import aboutImage from "@assets/New3.png";
 import stakingImage from "@assets/New02.png";
+import raffleImage from "@assets/New2.png";
 
 // Generate paths for gallery grid (1.jpg to 30.jpg)
 const galleryImages = Array.from({ length: 30 }, (_, i) => `/assets/${i + 1}.jpg`);
@@ -45,7 +46,7 @@ const team = [
 
 export default function Home() {
   return (
-    <div className="min-h-screen bg-[#0a0e27]">
+    <div className="min-h-screen bg-[#0a0e27] overflow-x-hidden">
       <Header />
 
       {/* Animated Marquee Banner */}
@@ -64,20 +65,20 @@ export default function Home() {
       </div>
 
       {/* HERO SECTION - THE DEEP */}
-      <section className="relative pt-40 pb-24 px-6 bg-gradient-to-b from-[#0a0e27] via-[#1a1f3a] to-[#0f1729] overflow-hidden">
+      <section className="relative pt-40 pb-0 px-6 bg-gradient-to-b from-[#0a0e27] via-[#1a1f3a] to-[#0f1729] overflow-hidden">
         {/* Animated background particles */}
         <div className="absolute inset-0 overflow-hidden pointer-events-none opacity-30">
           {[...Array(50)].map((_, i) => (
             <motion.div
               key={i}
               className="absolute w-1 h-1 bg-[#00d9ff] rounded-full"
-              initial={{ 
-                x: Math.random() * window.innerWidth, 
-                y: Math.random() * window.innerHeight 
+              style={{
+                left: `${Math.random() * 100}%`,
+                top: `${Math.random() * 100}%`,
               }}
               animate={{
-                y: [null, Math.random() * window.innerHeight],
-                x: [null, Math.random() * window.innerWidth],
+                y: [0, Math.random() * 100 - 50],
+                x: [0, Math.random() * 100 - 50],
               }}
               transition={{
                 duration: Math.random() * 20 + 10,
@@ -108,24 +109,25 @@ export default function Home() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.3 }}
-            className="text-xl md:text-2xl text-gray-300 font-semibold max-w-4xl mx-auto mb-12 leading-relaxed"
+            className="text-xl md:text-2xl text-gray-300 font-semibold max-w-4xl mx-auto mb-16 leading-relaxed px-4"
           >
             888 unique 2D sharks, meticulously designed with bold personalities and rare traits.
             Shacko merges art, community, and culture into a thriving world of fins, mischief, and ocean vibes.
           </motion.p>
 
-          {/* Hero Image */}
+          {/* Hero Image - Positioned at bottom of section */}
           <motion.div
             initial={{ scale: 0.9, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
             transition={{ delay: 0.5, duration: 0.8, type: "spring" }}
             className="relative"
           >
-            <div className="absolute inset-0 bg-[#00d9ff] blur-[120px] opacity-30 rounded-full" />
+            <div className="absolute inset-0 bg-[#00d9ff] blur-[120px] opacity-20 rounded-full" />
             <img
               src={heroImage}
-              alt="Shacko Sharks"
+              alt="Shacko Head"
               className="relative w-full max-w-5xl mx-auto h-auto drop-shadow-[0_0_80px_rgba(0,217,255,0.4)]"
+              style={{ marginBottom: "-1px" }}
             />
           </motion.div>
         </div>
@@ -195,7 +197,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* SHACKO STAKING SECTION */}
+      {/* SHACKO RAFFLE SECTION */}
       <section className="py-32 px-6 bg-gradient-to-b from-[#2d1b4e] to-[#1a3a52]">
         <div className="max-w-7xl mx-auto">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
@@ -207,10 +209,10 @@ export default function Home() {
               transition={{ duration: 0.8 }}
               className="relative order-2 lg:order-1"
             >
-              <div className="absolute inset-0 bg-gradient-to-br from-[#fbbf24] to-[#f59e0b] blur-[100px] opacity-30 rounded-full" />
+              <div className="absolute inset-0 bg-gradient-to-br from-[#8b5cf6] to-[#7c3aed] blur-[100px] opacity-30 rounded-full" />
               <img
-                src={stakingImage}
-                alt="Shacko Staking"
+                src={raffleImage}
+                alt="Shacko Raffle"
                 className="relative w-full h-auto rounded-3xl shadow-2xl"
               />
             </motion.div>
@@ -222,6 +224,45 @@ export default function Home() {
               viewport={{ once: true }}
               transition={{ duration: 0.8 }}
               className="order-1 lg:order-2"
+            >
+              <h2
+                className="text-7xl md:text-9xl font-black text-transparent bg-clip-text bg-gradient-to-r from-[#8b5cf6] to-[#7c3aed] mb-8"
+                style={{ fontFamily: "'Bebas Neue', 'Impact', sans-serif" }}
+              >
+                SHACKO RAFFLE
+              </h2>
+
+              <p className="text-gray-300 text-xl font-medium mb-8 leading-relaxed">
+                Enter raffles using xSHACK to win epic prizes! From rare NFTs to exclusive perks,
+                the raffle system brings excitement and rewards to the Shacko community.
+              </p>
+
+              {/* CTA Button */}
+              <a href="/raffle">
+                <motion.button
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  className="group flex items-center gap-3 bg-gradient-to-r from-[#8b5cf6] to-[#7c3aed] text-white px-10 py-5 rounded-full font-black text-xl shadow-[0_0_30px_rgba(139,92,246,0.5)] hover:shadow-[0_0_50px_rgba(139,92,246,0.7)] transition-all"
+                >
+                  Enter Raffles
+                  <ArrowRight size={24} className="group-hover:translate-x-1 transition-transform" />
+                </motion.button>
+              </a>
+            </motion.div>
+          </div>
+        </div>
+      </section>
+
+      {/* SHACKO STAKING SECTION */}
+      <section className="py-32 px-6 bg-gradient-to-b from-[#1a3a52] to-[#0f1729]">
+        <div className="max-w-7xl mx-auto">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+            {/* Left - Text */}
+            <motion.div
+              initial={{ opacity: 0, x: -50 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.8 }}
             >
               <h2
                 className="text-7xl md:text-9xl font-black text-transparent bg-clip-text bg-gradient-to-r from-[#fbbf24] to-[#f59e0b] mb-8"
@@ -247,12 +288,28 @@ export default function Home() {
                 </motion.button>
               </a>
             </motion.div>
+
+            {/* Right - Image */}
+            <motion.div
+              initial={{ opacity: 0, x: 50 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.8 }}
+              className="relative"
+            >
+              <div className="absolute inset-0 bg-gradient-to-br from-[#fbbf24] to-[#f59e0b] blur-[100px] opacity-30 rounded-full" />
+              <img
+                src={stakingImage}
+                alt="Shacko Staking"
+                className="relative w-full h-auto rounded-3xl shadow-2xl"
+              />
+            </motion.div>
           </div>
         </div>
       </section>
 
       {/* SHACKO SHOP SECTION */}
-      <section className="py-32 px-6 bg-gradient-to-b from-[#1a3a52] to-[#0f1729]">
+      <section className="py-32 px-6 bg-gradient-to-b from-[#0f1729] to-[#0a0e27]">
         <div className="max-w-5xl mx-auto text-center">
           <motion.h2
             initial={{ opacity: 0, y: -30 }}
@@ -296,42 +353,20 @@ export default function Home() {
       </section>
 
       {/* SHACKO HUB - GALLERY GRID */}
-      <section className="py-32 px-6 bg-gradient-to-b from-[#0f1729] to-[#1a1f3a]">
-        <div className="max-w-7xl mx-auto">
+      <section className="py-32 px-6 bg-[#0a0e27] overflow-hidden">
+        <div className="max-w-7xl mx-auto mb-16">
           <motion.h2
             initial={{ opacity: 0, y: -30 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            className="text-7xl md:text-9xl font-black text-transparent bg-clip-text bg-gradient-to-r from-[#00d9ff] to-[#0ea5e9] mb-16 text-center"
+            className="text-7xl md:text-9xl font-black text-transparent bg-clip-text bg-gradient-to-r from-[#00d9ff] to-[#0ea5e9] mb-8 text-center"
             style={{ fontFamily: "'Bebas Neue', 'Impact', sans-serif" }}
           >
             SHACKO HUB
           </motion.h2>
 
-          {/* Gallery Grid - Azuki Style */}
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
-            {galleryImages.map((src, i) => (
-              <motion.div
-                key={i}
-                initial={{ opacity: 0, scale: 0.8 }}
-                whileInView={{ opacity: 1, scale: 1 }}
-                viewport={{ once: true }}
-                transition={{ delay: i * 0.02 }}
-                whileHover={{ scale: 1.05, rotate: 2 }}
-                className="relative group cursor-pointer"
-              >
-                <div className="absolute inset-0 bg-gradient-to-br from-[#00d9ff] to-[#ec4899] rounded-2xl opacity-0 group-hover:opacity-20 transition-opacity" />
-                <img
-                  src={src}
-                  alt={`Shacko ${i + 1}`}
-                  className="w-full aspect-square object-cover rounded-2xl border-2 border-[#2a3f5f] group-hover:border-[#00d9ff] transition-all shadow-xl"
-                />
-              </motion.div>
-            ))}
-          </div>
-
           {/* View All Button */}
-          <div className="text-center mt-16">
+          <div className="text-center">
             <motion.button
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
@@ -342,10 +377,109 @@ export default function Home() {
             </motion.button>
           </div>
         </div>
+
+        {/* Scrolling Gallery Grid - Azuki Style */}
+        <div className="space-y-6">
+          {/* Row 1 - Left to Right */}
+          <div className="flex overflow-hidden">
+            <motion.div
+              animate={{ x: [0, -2000] }}
+              transition={{ duration: 40, repeat: Infinity, ease: "linear" }}
+              className="flex gap-6 flex-shrink-0"
+            >
+              {[...galleryImages.slice(0, 8), ...galleryImages.slice(0, 8)].map((src, i) => (
+                <div
+                  key={i}
+                  className="relative group cursor-pointer flex-shrink-0"
+                  style={{ width: "280px", height: "280px" }}
+                >
+                  <div className="absolute inset-0 bg-gradient-to-br from-[#00d9ff] to-[#ec4899] rounded-2xl opacity-0 group-hover:opacity-20 transition-opacity" />
+                  <img
+                    src={src}
+                    alt={`Shacko ${i + 1}`}
+                    className="w-full h-full object-cover rounded-2xl border-2 border-[#2a3f5f] group-hover:border-[#00d9ff] transition-all shadow-xl"
+                  />
+                </div>
+              ))}
+            </motion.div>
+          </div>
+
+          {/* Row 2 - Right to Left */}
+          <div className="flex overflow-hidden">
+            <motion.div
+              animate={{ x: [-2000, 0] }}
+              transition={{ duration: 40, repeat: Infinity, ease: "linear" }}
+              className="flex gap-6 flex-shrink-0"
+            >
+              {[...galleryImages.slice(8, 16), ...galleryImages.slice(8, 16)].map((src, i) => (
+                <div
+                  key={i}
+                  className="relative group cursor-pointer flex-shrink-0"
+                  style={{ width: "280px", height: "280px" }}
+                >
+                  <div className="absolute inset-0 bg-gradient-to-br from-[#00d9ff] to-[#ec4899] rounded-2xl opacity-0 group-hover:opacity-20 transition-opacity" />
+                  <img
+                    src={src}
+                    alt={`Shacko ${i + 9}`}
+                    className="w-full h-full object-cover rounded-2xl border-2 border-[#2a3f5f] group-hover:border-[#00d9ff] transition-all shadow-xl"
+                  />
+                </div>
+              ))}
+            </motion.div>
+          </div>
+
+          {/* Row 3 - Left to Right */}
+          <div className="flex overflow-hidden">
+            <motion.div
+              animate={{ x: [0, -2000] }}
+              transition={{ duration: 40, repeat: Infinity, ease: "linear" }}
+              className="flex gap-6 flex-shrink-0"
+            >
+              {[...galleryImages.slice(16, 24), ...galleryImages.slice(16, 24)].map((src, i) => (
+                <div
+                  key={i}
+                  className="relative group cursor-pointer flex-shrink-0"
+                  style={{ width: "280px", height: "280px" }}
+                >
+                  <div className="absolute inset-0 bg-gradient-to-br from-[#00d9ff] to-[#ec4899] rounded-2xl opacity-0 group-hover:opacity-20 transition-opacity" />
+                  <img
+                    src={src}
+                    alt={`Shacko ${i + 17}`}
+                    className="w-full h-full object-cover rounded-2xl border-2 border-[#2a3f5f] group-hover:border-[#00d9ff] transition-all shadow-xl"
+                  />
+                </div>
+              ))}
+            </motion.div>
+          </div>
+
+          {/* Row 4 - Right to Left */}
+          <div className="flex overflow-hidden">
+            <motion.div
+              animate={{ x: [-2000, 0] }}
+              transition={{ duration: 40, repeat: Infinity, ease: "linear" }}
+              className="flex gap-6 flex-shrink-0"
+            >
+              {[...galleryImages.slice(24, 30), ...galleryImages.slice(0, 2), ...galleryImages.slice(24, 30), ...galleryImages.slice(0, 2)].map((src, i) => (
+                <div
+                  key={i}
+                  className="relative group cursor-pointer flex-shrink-0"
+                  style={{ width: "280px", height: "280px" }}
+                >
+                  <div className="absolute inset-0 bg-gradient-to-br from-[#00d9ff] to-[#ec4899] rounded-2xl opacity-0 group-hover:opacity-20 transition-opacity" />
+                  <img
+                    src={src}
+                    alt={`Shacko ${i + 25}`}
+                    className="w-full h-full object-cover rounded-2xl border-2 border-[#2a3f5f] group-hover:border-[#00d9ff] transition-all shadow-xl"
+                  />
+                </div>
+              ))}
+            </motion.div>
+          </div>
+        </div>
       </section>
 
       {/* SHACKO EXPERIENCES - Theatre, Pump, Staking */}
-      <section className="py-32 px-6 bg-gradient-to-b from-[#1a1f3a] to-[#2d1b4e]">
+      <section className="py-32 px-6 bg-gradient-to-b from-[#0a0e27] to-[#2d1b4e]">
         <div className="max-w-7xl mx-auto">
           <motion.h2
             initial={{ opacity: 0, y: -30 }}
