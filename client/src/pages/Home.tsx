@@ -8,7 +8,7 @@ import { Footer } from "@/components/Footer";
 
 // Assets
 import heroImage from "@assets/New1.png";
-import worldBuildingImage from "@assets/New2.png";
+import worldBuildingImage from "@assets/New02.png";
 import roadmapThumbnail from "@assets/New3.png";
 import bishopImage from "@assets/Bishop.jpg";
 import allwellImage from "@assets/Allwell.jpg";
