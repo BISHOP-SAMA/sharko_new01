@@ -1,156 +1,399 @@
 "use client";
 
+import { useState } from "react";
 import { motion } from "framer-motion";
-import { Link } from "wouter";
 import Header from "@/components/Header";
 import { Footer } from "@/components/Footer";
-
-// Assets
-import heroImage from "@assets/New1.png";
-import worldBuildingImage from "@assets/New02.png";
-import roadmapThumbnail from "@assets/New3.png";
+import heroImage from "@assets/hero-shark.png";
 import bishopImage from "@assets/Bishop.jpg";
 import allwellImage from "@assets/Allwell.jpg";
 import kageImage from "@assets/Kage.jpg";
+import confetti from "canvas-confetti";
+import { ComicButton } from "@/components/ui/comic-button";
 
-// Generate paths for 1.jpg to 30.jpg
-const topRow = Array.from({ length: 15 }, (_, i) => `/assets/${i + 1}.jpg`);
-const bottomRow = Array.from({ length: 15 }, (_, i) => `/assets/${i + 16}.jpg`);
-
+// Team data
 const team = [
-  { name: "BISHOP", role: "Product Manager", image: bishopImage, color: "from-pink-400 to-rose-600" },
-  { name: "ALLWELL", role: "Developer", image: allwellImage, color: "from-blue-400 to-indigo-600" },
-  { name: "KAGE", role: "CM", image: kageImage, color: "from-amber-400 to-orange-600" },
+  {
+    name: "BISHOP",
+    role: "Product Manager",
+    image: bishopImage,
+    traits: ["Jack of all trades", "Works without break", "Part time degen"],
+  },
+  {
+    name: "Allwell",
+    role: "Developer",
+    image: allwellImage,
+    traits: [
+      "He's the small voice you hear in your head sometimes",
+      "Always pitching ideas somewhere to someone",
+      "Fast learner",
+    ],
+  },
+  {
+    name: "KAGE",
+    role: "CM",
+    image: kageImage,
+    traits: [
+      "Loses money everyday trading",
+      "Collaborative learner",
+      "The missing piece your project needs",
+    ],
+  },
 ];
 
+type WhitelistStatus = "OG" | "GTD" | "WL" | "OG+GTD" | "OG+WL" | "GTD+WL" | "ALL" | "NONE";
+
 export default function Home() {
+  const [wallet, setWallet] = useState("");
+  const [status, setStatus] = useState<WhitelistStatus | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+  const [showModal, setShowModal] = useState(false);
+
+  const fireConfetti = () => {
+    const duration = 3000;
+    const end = Date.now() + duration;
+
+    const frame = () => {
+      confetti({
+        particleCount: 3,
+        angle: 60,
+        spread: 55,
+        origin: { x: 0 },
+        colors: ["#0ea5e9", "#38bdf8", "#ec4899", "#fbbf24"],
+      });
+      confetti({
+        particleCount: 3,
+        angle: 120,
+        spread: 55,
+        origin: { x: 1 },
+        colors: ["#0ea5e9", "#38bdf8", "#ec4899", "#fbbf24"],
+      });
+
+      if (Date.now() < end) {
+        requestAnimationFrame(frame);
+      }
+    };
+
+    frame();
+  };
+
+  const checkWhitelist = async () => {
+    setError("");
+    setStatus(null);
+    setShowModal(false);
+
+    if (!wallet.startsWith("0x") || wallet.length !== 42) {
+      setError("Invalid wallet address format");
+      return;
+    }
+
+    setLoading(true);
+
+    try {
+      const response = await fetch("/api/check-wallet", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ wallet }),
+      });
+
+      const data = await response.json();
+
+      if (data.error) {
+        setError(data.error);
+      } else {
+        setStatus(data.status);
+
+        if (data.status !== "NONE") {
+          setShowModal(true);
+          fireConfetti();
+        }
+      }
+    } catch (err) {
+      setError("Failed to check wallet. Please try again.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const shouldShowBadge = (badge: "OG" | "GTD" | "WL") => {
+    if (!status || status === "NONE") return false;
+    if (status === "ALL") return true;
+    if (badge === "OG") return status === "OG" || status.includes("OG");
+    if (badge === "GTD") return status === "GTD" || status.includes("GTD");
+    if (badge === "WL") return status === "WL" || status.includes("WL");
+    return false;
+  };
+
   return (
-    <div className="min-h-screen bg-[#0ea5e9] selection:bg-[#ec4899] selection:text-white overflow-x-hidden">
-      {/* Dynamic Background Pattern */}
-      <div className="fixed inset-0 opacity-20 pointer-events-none" 
-           style={{ backgroundImage: `url("radial-gradient(#fff 2px, transparent 2px)")`, backgroundSize: '40px 40px' }} />
-      
+    <div className="min-h-screen bg-white">
       <Header />
 
-      {/* 1. VIBRANT HERO */}
-      <section className="relative pt-32 pb-12 px-6">
+      {/* Marquee Banner - "$PENGU NOW LIVE" style */}
+      <div className="fixed top-20 left-0 right-0 bg-[#1e293b] py-3 z-40 overflow-hidden border-b-4 border-black">
+        <motion.div
+          animate={{ x: ["0%", "-50%"] }}
+          transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
+          className="flex whitespace-nowrap"
+        >
+          {[...Array(10)].map((_, i) => (
+            <span key={i} className="text-2xl font-bold text-white mx-8">
+              $SHACKO COMING SOON <span className="text-[#0ea5e9]">•</span>
+            </span>
+          ))}
+        </motion.div>
+      </div>
+
+      {/* Hero Section - "THE HUDDLE" style */}
+      <section className="relative pt-40 pb-20 px-6 bg-gradient-to-b from-[#0ea5e9] to-[#38bdf8] overflow-hidden">
+        {/* Animated snow/particles effect */}
+        <div className="absolute inset-0 overflow-hidden pointer-events-none">
+          {[...Array(30)].map((_, i) => (
+            <motion.div
+              key={i}
+              className="absolute w-2 h-2 bg-white rounded-full opacity-60"
+              initial={{ y: -20, x: Math.random() * window.innerWidth }}
+              animate={{
+                y: window.innerHeight + 20,
+                x: Math.random() * window.innerWidth,
+              }}
+              transition={{
+                duration: Math.random() * 10 + 10,
+                repeat: Infinity,
+                ease: "linear",
+                delay: Math.random() * 5,
+              }}
+            />
+          ))}
+        </div>
+
         <div className="max-w-7xl mx-auto text-center relative z-10">
-          <motion.h1 
-            initial={{ y: 50, opacity: 0 }}
-            animate={{ y: 0, opacity: 1 }}
-            className="text-[12vw] font-[Bangers] text-white leading-[0.8] mb-8 uppercase italic drop-shadow-[0_10px_0_rgba(0,0,0,0.2)]"
+          {/* THE DEEP - Big title */}
+          <motion.h1
+            initial={{ opacity: 0, y: -50 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8 }}
+            className="text-[15vw] md:text-[180px] font-black text-white leading-none mb-6"
+            style={{
+              fontFamily: "'Bebas Neue', 'Impact', sans-serif",
+              letterSpacing: "0.05em",
+              textShadow: "4px 4px 0px rgba(0,0,0,0.2)",
+            }}
           >
-            CHOMP. <span className="text-[#fbbf24]">COLLECT.</span> SHACKO.
+            THE DEEP
           </motion.h1>
 
+          {/* Subtitle */}
+          <motion.p
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.3 }}
+            className="text-xl md:text-2xl text-white font-bold max-w-3xl mx-auto mb-12 uppercase tracking-wide"
+          >
+            SHACKO IS A GLOBAL IP FOCUSED ON PROLIFERATING THE SHARK, MEMETIC CULTURE, AND GOOD VIBES.
+          </motion.p>
+
+          {/* Hero Sharks Image */}
           <motion.div
             initial={{ scale: 0.8, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
-            transition={{ type: "spring", damping: 15 }}
-            className="relative inline-block"
+            transition={{ delay: 0.5, duration: 0.8 }}
+            className="relative"
           >
-            {/* Glow effect behind hero */}
-            <div className="absolute inset-0 bg-white/30 blur-[100px] rounded-full" />
-            <img src={heroImage} alt="Hero" className="relative w-full max-w-5xl h-auto drop-shadow-[0_20px_50px_rgba(0,0,0,0.3)]" />
+            <img
+              src={heroImage}
+              alt="Shacko Characters"
+              className="w-full max-w-4xl mx-auto h-auto drop-shadow-2xl"
+            />
           </motion.div>
         </div>
       </section>
 
-      {/* 2. THE DEEP (High-Contrast Glassmorphism) */}
-      <section className="py-20 px-6">
-        <div className="max-w-5xl mx-auto bg-white/10 backdrop-blur-xl border-4 border-white/20 rounded-[4rem] p-12 md:p-20 text-center shadow-2xl">
-          <h2 className="text-6xl md:text-8xl font-[Bangers] text-white mb-6 italic tracking-tighter">THE DEEP</h2>
-          <p className="text-2xl md:text-4xl text-white font-black leading-tight uppercase">
-            888 unique <span className="text-[#fbbf24]">2D sharks</span>. 
-            Meticulously designed. <span className="text-[#ec4899]">Bold personalities</span>. 
-            Ocean vibes.
+      {/* About SHACKO - Pink Section */}
+      <section className="py-32 px-6 bg-gradient-to-b from-[#fbbf24] to-[#f59e0b]">
+        <div className="max-w-5xl mx-auto">
+          <h2
+            className="text-7xl md:text-9xl font-black text-white mb-12 text-center"
+            style={{ fontFamily: "'Bebas Neue', 'Impact', sans-serif" }}
+          >
+            SHACKO
+          </h2>
+
+          <div className="space-y-8 text-white text-xl md:text-2xl font-semibold leading-relaxed">
+            <p>
+              WELCOME TO THE WORLD OF SHACKO. A WEB3-BORN BRAND THAT FOSTERS CREATIVITY, FREEDOM, AND COMMUNITY.
+            </p>
+
+            <p>
+              THE SHACKO BRAND PRODUCES CONTENT, MERCHANDISE, TOYS, AND DIGITAL COLLECTABLES. WE BELIEVE IN THE POWER OF PLAY AND IMAGINATION, AND WE'RE COMMITTED TO HELPING YOU UNLOCK YOUR INNER SHARK.
+            </p>
+
+            <p>
+              IT'S A VERY DEEP OCEAN BUT YOU'LL BE SAFE WITH YOUR NEW FAVORITE SHARK FAMILY!
+            </p>
+          </div>
+        </div>
+      </section>
+
+      {/* The Shacko Prophecy - Beige Section */}
+      <section className="py-32 px-6 bg-[#fef3c7]">
+        <div className="max-w-4xl mx-auto text-center">
+          <h2
+            className="text-7xl md:text-9xl font-black text-black mb-8"
+            style={{ fontFamily: "'Bebas Neue', 'Impact', sans-serif" }}
+          >
+            THE SHACKO PROPHECY
+          </h2>
+
+          <p className="text-2xl font-bold text-black mb-12 uppercase">
+            LEARN ABOUT THE SHACKO LORE
           </p>
-        </div>
-      </section>
 
-      {/* 3. AZUKI-STYLE SCROLL (Now with vibrant borders) */}
-      <section className="py-12 space-y-8">
-        <div className="flex rotate-[-2deg] scale-105">
-          <motion.div 
-            animate={{ x: [0, -2000] }} 
-            transition={{ duration: 30, repeat: Infinity, ease: "linear" }}
-            className="flex gap-4"
+          <button className="group flex items-center gap-4 mx-auto bg-white border-4 border-black rounded-full px-12 py-6 hover:bg-gray-50 transition-all shadow-lg">
+            <span className="text-3xl">↗</span>
+            <span className="text-3xl font-black uppercase">Discover</span>
+          </button>
+
+          {/* Placeholder shark character */}
+          <motion.div
+            initial={{ y: 50, opacity: 0 }}
+            whileInView={{ y: 0, opacity: 1 }}
+            viewport={{ once: true }}
+            className="mt-16"
           >
-            {[...topRow, ...topRow].map((src, i) => (
-              <img key={i} src={src} className="w-56 h-56 rounded-3xl border-8 border-white shadow-xl object-cover flex-shrink-0" />
-            ))}
-          </motion.div>
-        </div>
-        <div className="flex rotate-[2deg] scale-105">
-          <motion.div 
-            animate={{ x: [-2000, 0] }} 
-            transition={{ duration: 35, repeat: Infinity, ease: "linear" }}
-            className="flex gap-4"
-          >
-            {[...bottomRow, ...bottomRow].map((src, i) => (
-              <img key={i} src={src} className="w-56 h-56 rounded-3xl border-8 border-white shadow-xl object-cover flex-shrink-0" />
-            ))}
+            <div className="w-64 h-64 mx-auto bg-gradient-to-br from-[#0ea5e9] to-[#38bdf8] rounded-3xl flex items-center justify-center border-4 border-black shadow-xl">
+              <span className="text-9xl">🦈</span>
+            </div>
           </motion.div>
         </div>
       </section>
 
-      {/* 4. WORLD BUILDING (Vibrant Blue to Deep Navy Gradient) */}
-      <section className="py-24 px-6">
-        <div className="max-w-7xl mx-auto bg-gradient-to-br from-[#1e3a5f] to-[#0f172a] rounded-[4rem] overflow-hidden flex flex-col md:flex-row items-center border-4 border-white/10 shadow-3xl">
-          <div className="md:w-1/2 p-12 lg:p-20">
-            <h2 className="text-6xl md:text-8xl font-[Bangers] text-white mb-6 italic uppercase leading-none">
-              A world where <br/> every shark <br/> <span className="text-[#0ea5e9]">has a story</span>
-            </h2>
-            <Link href="/lore">
-              <button className="bg-[#fbbf24] text-black px-12 py-6 rounded-3xl font-black uppercase text-2xl shadow-[0_10px_0_0_#b45309] hover:translate-y-1 hover:shadow-none transition-all">
-                DIVE INTO LORE
-              </button>
-            </Link>
-          </div>
-          <div className="md:w-1/2 p-8">
-            <img src={worldBuildingImage} alt="World Building" className="w-full h-auto rounded-[3rem] shadow-2xl border-4 border-white/10" />
-          </div>
+      {/* Shop Section - Pink Section */}
+      <section className="py-32 px-6 bg-gradient-to-b from-[#fbbf24] to-[#f59e0b]">
+        <div className="max-w-4xl mx-auto text-center">
+          <h2
+            className="text-7xl md:text-9xl font-black text-white mb-8"
+            style={{ fontFamily: "'Bebas Neue', 'Impact', sans-serif" }}
+          >
+            SHOP MERCH & COLLECTIBLES
+          </h2>
+
+          <p className="text-2xl font-bold text-white mb-12 uppercase">
+            START YOUR COLLECTION TODAY!
+          </p>
+
+          <button className="group flex items-center gap-4 mx-auto bg-black text-white border-4 border-white rounded-full px-12 py-6 hover:bg-gray-900 transition-all shadow-lg">
+            <span className="text-3xl">↗</span>
+            <span className="text-3xl font-black uppercase">Shop Now</span>
+          </button>
+
+          {/* Placeholder merch display */}
+          <motion.div
+            initial={{ y: 50, opacity: 0 }}
+            whileInView={{ y: 0, opacity: 1 }}
+            viewport={{ once: true }}
+            className="mt-16"
+          >
+            <div className="w-64 h-64 mx-auto bg-white rounded-3xl flex items-center justify-center border-4 border-black shadow-xl">
+              <span className="text-9xl">👕</span>
+            </div>
+          </motion.div>
         </div>
       </section>
 
-      {/* 5. ROADMAP & GALLERY (Bento-style with Color Pops) */}
-      <section className="py-24 px-6 max-w-7xl mx-auto grid md:grid-cols-2 gap-12">
-        <Link href="/roadmap">
-          <div className="group bg-[#fbbf24] p-4 rounded-[4rem] border-4 border-black shadow-[15px_15px_0_0_#000] cursor-pointer hover:translate-x-2 hover:translate-y-2 hover:shadow-none transition-all">
-            <img src={roadmapThumbnail} alt="Roadmap" className="w-full h-80 object-cover rounded-[3rem] mb-6 border-4 border-black" />
-            <div className="px-6 pb-6">
-              <h3 className="text-5xl font-[Bangers] text-black italic">THE ROADMAP</h3>
-              <p className="text-black/60 font-black uppercase tracking-widest text-sm italic">See the future →</p>
-            </div>
-          </div>
-        </Link>
-        <Link href="/gallery">
-          <div className="group bg-[#ec4899] p-12 rounded-[4rem] border-4 border-black shadow-[15px_15px_0_0_#000] cursor-pointer hover:translate-x-2 hover:translate-y-2 hover:shadow-none transition-all flex flex-col justify-center items-center text-center">
-            <div className="w-48 h-48 bg-white rounded-full flex items-center justify-center mb-8 border-8 border-black shadow-xl">
-              <span className="text-8xl">🖼️</span>
-            </div>
-            <h3 className="text-6xl font-[Bangers] text-white italic">THE GALLERY</h3>
-            <p className="text-white font-black uppercase tracking-widest text-sm italic">Browse all 888 →</p>
-          </div>
-        </Link>
-      </section>
-
-      {/* 6. MEET THE SQUAD (Vibrant Cards) */}
-      <section className="py-32 px-6">
+      {/* Community Section - Blue Section */}
+      <section className="py-32 px-6 bg-gradient-to-b from-[#0ea5e9] to-[#38bdf8]">
         <div className="max-w-7xl mx-auto">
-          <h2 className="text-7xl md:text-9xl font-[Bangers] text-white text-center mb-20 italic drop-shadow-lg">MEET THE SQUAD</h2>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-12">
-            {team.map((member, i) => (
-              <div key={i} className="group relative">
-                <div className={`absolute inset-0 bg-gradient-to-b ${member.color} rounded-[3rem] rotate-3 group-hover:rotate-0 transition-transform`} />
-                <div className="relative bg-white border-4 border-black p-6 rounded-[3rem] shadow-xl text-center hover:-translate-y-4 transition-transform">
-                  <img src={member.image} className="w-full aspect-square object-cover rounded-[2rem] mb-6 border-4 border-black" alt={member.name} />
-                  <h4 className="text-4xl font-[Bangers] text-black italic">{member.name}</h4>
-                  <p className="font-black text-[#0ea5e9] uppercase text-sm">{member.role}</p>
+          <h2
+            className="text-7xl md:text-9xl font-black text-white text-center mb-20"
+            style={{ fontFamily: "'Bebas Neue', 'Impact', sans-serif" }}
+          >
+            BABY SHACKOS
+          </h2>
+
+          <p className="text-2xl md:text-3xl text-white font-bold text-center max-w-4xl mx-auto leading-relaxed uppercase mb-12">
+            BABY SHACKOS ARE 888 SHACKOS OF OCEAN DESCENT. BABY SHACKOS ARE CUTE AND ADORABLE BUT DON'T LET THEIR LOOKS FOOL YOU. THEY ARE FIERCE, MIGHTY, AND ARE ALLIES IN THE FIGHT AGAINST THE EVIL BEARS OF NEGATIVITY.
+          </p>
+
+          {/* Team Cards */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-10 mt-20">
+            {team.map((member, idx) => (
+              <motion.div
+                key={idx}
+                initial={{ opacity: 0, scale: 0.9 }}
+                whileInView={{ opacity: 1, scale: 1 }}
+                viewport={{ once: true }}
+                transition={{ delay: idx * 0.2 }}
+                className="bg-white border-4 border-black rounded-3xl p-8 shadow-xl hover:-translate-y-2 transition-transform"
+              >
+                <div className="aspect-square rounded-2xl border-4 border-black overflow-hidden mb-6">
+                  <img src={member.image} alt={member.name} className="w-full h-full object-cover" />
                 </div>
-              </div>
+                <h3 className="text-4xl font-black text-[#0ea5e9] mb-1">{member.name}</h3>
+                <p className="text-xl font-bold text-[#ec4899] mb-4 uppercase">{member.role}</p>
+                <ul className="space-y-2">
+                  {member.traits.map((trait, i) => (
+                    <li key={i} className="flex items-start gap-2 font-bold text-slate-700">
+                      <span className="mt-1.5 w-2 h-2 rounded-full bg-black shrink-0" />
+                      {trait}
+                    </li>
+                  ))}
+                </ul>
+              </motion.div>
             ))}
           </div>
+        </div>
+      </section>
+
+      {/* Whitelist Checker - Clean White Section */}
+      <section className="py-32 px-6 bg-white">
+        <div className="max-w-3xl mx-auto">
+          <motion.div
+            initial={{ scale: 0.9, opacity: 0 }}
+            whileInView={{ scale: 1, opacity: 1 }}
+            viewport={{ once: true }}
+            className="bg-gradient-to-br from-[#0ea5e9] to-[#38bdf8] border-4 border-black rounded-3xl p-10 shadow-2xl text-center"
+          >
+            <h2 className="text-6xl font-black text-white mb-4 uppercase">
+              CHECK THE LIST
+            </h2>
+            <p className="text-xl font-bold mb-8 text-white">
+              Are you OG, GTD, or WL? Paste your wallet below!
+            </p>
+
+            <div className="space-y-4">
+              <input
+                type="text"
+                value={wallet}
+                onChange={(e) => setWallet(e.target.value)}
+                placeholder="0x..."
+                className="w-full h-16 rounded-xl border-4 border-black px-6 text-xl font-mono focus:ring-4 focus:ring-[#ec4899]/30 outline-none transition-all"
+              />
+
+              {error && <p className="text-red-500 font-bold">{error}</p>}
+
+              <ComicButton
+                size="lg"
+                variant="accent"
+                className="w-full"
+                onClick={checkWhitelist}
+                disabled={loading}
+              >
+                {loading ? "CHECKING..." : "Verify Status"}
+              </ComicButton>
+            </div>
+
+            {status === "NONE" && (
+              <motion.div
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="mt-8 p-6 rounded-2xl border-4 border-black bg-red-50"
+              >
+                <p className="font-black text-4xl text-slate-400">NOT ON LIST YET... 💨</p>
+                <p className="text-gray-600 mt-2">Keep swimming! Future opportunities await.</p>
+              </motion.div>
+            )}
+          </motion.div>
         </div>
       </section>
 
