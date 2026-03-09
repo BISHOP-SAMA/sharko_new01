@@ -36,8 +36,8 @@
   
   --radius: 1.5rem; /* Extra rounded for cartoon feel */
 
-  --font-display: 'Bangers', cursive;
-  --font-body: 'Fredoka', sans-serif;
+  --font-display: Bangers, cursive;
+  --font-body: Fredoka, sans-serif;
 }
 
 @layer base {
