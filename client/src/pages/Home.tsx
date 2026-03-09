@@ -1,298 +1,167 @@
 "use client";
 
-import { GalleryGrid } from "@/components/GalleryGrid";
-import { FloatingSharks } from "@/components/FloatingSharks";
-import MobileMenu from "@/components/MobileMenu";
-import { Footer } from "@/components/Footer";
-import { motion, AnimatePresence } from "framer-motion";
-import { ComicButton } from "@/components/ui/comic-button";
-import { ConnectButton } from "@rainbow-me/rainbowkit";
 import { useState } from "react";
-import confetti from "canvas-confetti";
-import heroImage from "@assets/hero-shark.png";
-import backShackoImage from "@assets/back-shacko.png";
+import { motion } from "framer-motion";
+import { Link } from "wouter";
+import Header from "@/components/Header";
+import { Footer } from "@/components/Footer";
+
+// Assets
+import heroImage from "@assets/New1.png";
+import worldBuildingImage from "@assets/New2.png";
+import roadmapThumbnail from "@assets/New3.png";
 import bishopImage from "@assets/Bishop.jpg";
 import allwellImage from "@assets/Allwell.jpg";
 import kageImage from "@assets/Kage.jpg";
 
-// Team data
+// Generate paths for 1-30.png
+const collectionImages = Array.from({ length: 30 }, (_, i) => `/assets/${i + 1}.png`);
+const topRow = collectionImages.slice(0, 15);
+const bottomRow = collectionImages.slice(15, 30);
+
 const team = [
-  {
-    name: "BISHOP",
-    role: "Product Manager",
-    image: bishopImage,
-    traits: ["Jack of all trades", "Works without break", "Part time degen"],
-  },
-  {
-    name: "Allwell",
-    role: "Developer",
-    image: allwellImage,
-    traits: [
-      "He's the small voice you hear in your head sometimes",
-      "Always pitching ideas somewhere to someone",
-      "Fast leaner",
-    ],
-  },
-  {
-    name: "KAGE",
-    role: "CM",
-    image: kageImage,
-    traits: [
-      "Loses money everyday trading",
-      "Collaborative learner",
-      "The missing piece your project needs",
-    ],
-  },
+  { name: "BISHOP", role: "Product Manager", image: bishopImage, bio: "Jack of all trades." },
+  { name: "ALLWELL", role: "Developer", image: allwellImage, bio: "Always pitching ideas." },
+  { name: "KAGE", role: "CM", image: kageImage, bio: "The missing piece." },
 ];
 
-// Whitelist status type
-type WhitelistStatus = "OG" | "GTD" | "WL" | "OG+GTD" | "OG+WL" | "GTD+WL" | "ALL" | "NONE";
-
 export default function Home() {
-  const [wallet, setWallet] = useState("");
-  const [status, setStatus] = useState<WhitelistStatus | null>(null);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
-  const [showModal, setShowModal] = useState(false);
-
-  const scrollToVibes = () => {
-    document.getElementById("vibes")?.scrollIntoView({ behavior: "smooth" });
-  };
-
-  const fireConfetti = () => {
-    const duration = 3000;
-    const end = Date.now() + duration;
-
-    const frame = () => {
-      confetti({
-        particleCount: 3,
-        angle: 60,
-        spread: 55,
-        origin: { x: 0 },
-        colors: ["#0ea5e9", "#38bdf8", "#ec4899", "#fbbf24"],
-      });
-      confetti({
-        particleCount: 3,
-        angle: 120,
-        spread: 55,
-        origin: { x: 1 },
-        colors: ["#0ea5e9", "#38bdf8", "#ec4899", "#fbbf24"],
-      });
-
-      if (Date.now() < end) {
-        requestAnimationFrame(frame);
-      }
-    };
-
-    frame();
-  };
-
-  const checkWhitelist = async () => {
-    setError("");
-    setStatus(null);
-    setShowModal(false);
-
-    if (!wallet.startsWith("0x") || wallet.length !== 42) {
-      setError("Invalid wallet address format");
-      return;
-    }
-
-    setLoading(true);
-
-    try {
-      const response = await fetch("/api/check-wallet", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ wallet }),
-      });
-
-      const data = await response.json();
-
-      if (data.error) {
-        setError(data.error);
-      } else {
-        setStatus(data.status);
-
-        if (data.status !== "NONE") {
-          setShowModal(true);
-          fireConfetti();
-        }
-      }
-    } catch (err) {
-      setError("Failed to check wallet. Please try again.");
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const shouldShowBadge = (badge: "OG" | "GTD" | "WL") => {
-    if (!status || status === "NONE") return false;
-    if (status === "ALL") return true;
-    if (badge === "OG") return status === "OG" || status.includes("OG");
-    if (badge === "GTD") return status === "GTD" || status.includes("GTD");
-    if (badge === "WL") return status === "WL" || status.includes("WL");
-    return false;
-  };
-
   return (
-    <div className="min-h-screen bg-gradient-to-b from-[#0ea5e9] via-[#38bdf8] to-[#7dd3fc] selection:bg-[#ec4899] selection:text-white overflow-x-hidden">
-      <FloatingSharks />
+    <div className="min-h-screen bg-[#F0F9FF] selection:bg-[#0ea5e9] selection:text-white overflow-x-hidden text-slate-900 font-sans">
+      <Header />
 
-      {/* Success Modal */}
-      <AnimatePresence>
-        {showModal && status && status !== "NONE" && (
+      {/* 1. HERO SECTION */}
+      <section className="relative pt-32 pb-20 px-6 overflow-hidden">
+        <div className="max-w-7xl mx-auto flex flex-col items-center text-center">
           <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 backdrop-blur-sm p-4"
-            onClick={() => setShowModal(false)}
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="inline-block px-6 py-2 bg-white border-2 border-[#0ea5e9]/10 rounded-full text-[#0ea5e9] font-bold text-sm mb-8 shadow-sm"
           >
-            <motion.div
-              initial={{ scale: 0.5, y: 50 }}
-              animate={{ scale: 1, y: 0 }}
-              exit={{ scale: 0.5, y: 50 }}
-              transition={{ type: "spring", duration: 0.5 }}
-              className="bg-white rounded-3xl border-4 border-black comic-shadow-lg max-w-md w-full p-8 relative"
-              onClick={(e) => e.stopPropagation()}
-            >
-              <button
-                onClick={() => setShowModal(false)}
-                className="absolute top-4 right-4 w-8 h-8 rounded-full bg-black text-white font-bold hover:bg-gray-800"
-              >
-                ✕
-              </button>
-
-              <div className="flex justify-center mb-6">
-                <img
-                  src={backShackoImage}
-                  alt="Success Sharks"
-                  className="w-48 h-48 object-contain"
-                />
-              </div>
-
-              <h2 className="text-5xl font-[Bangers] text-center text-[#0ea5e9] mb-4 text-stroke-sm">
-                🎉 YOU'RE IN! 🎉
-              </h2>
-
-              <div className="flex justify-center gap-3 flex-wrap mb-6">
-                {shouldShowBadge("OG") && (
-                  <motion.div
-                    initial={{ scale: 0 }}
-                    animate={{ scale: 1 }}
-                    transition={{ delay: 0.2, type: "spring" }}
-                    className="bg-gradient-to-r from-yellow-400 to-orange-500 text-black px-6 py-3 rounded-xl font-[Bangers] text-2xl border-3 border-black comic-shadow"
-                  >
-                    👑 OG PHASE
-                  </motion.div>
-                )}
-
-                {shouldShowBadge("GTD") && (
-                  <motion.div
-                    initial={{ scale: 0 }}
-                    animate={{ scale: 1 }}
-                    transition={{ delay: 0.4, type: "spring" }}
-                    className="bg-gradient-to-r from-blue-400 to-cyan-500 text-black px-6 py-3 rounded-xl font-[Bangers] text-2xl border-3 border-black comic-shadow"
-                  >
-                    💎 GTD PHASE
-                  </motion.div>
-                )}
-
-                {shouldShowBadge("WL") && (
-                  <motion.div
-                    initial={{ scale: 0 }}
-                    animate={{ scale: 1 }}
-                    transition={{ delay: 0.6, type: "spring" }}
-                    className="bg-gradient-to-r from-green-400 to-teal-500 text-black px-6 py-3 rounded-xl font-[Bangers] text-2xl border-3 border-black comic-shadow"
-                  >
-                    🎟️ WL PHASE
-                  </motion.div>
-                )}
-              </div>
-
-              <p className="text-center text-gray-600 font-[Fredoka] text-lg mb-6">
-                You're officially on the Shark List! Get ready to chomp! 🦈
-              </p>
-
-              <ComicButton onClick={() => setShowModal(false)} className="w-full" size="lg">
-                AWESOME!
-              </ComicButton>
-            </motion.div>
+            🦈 WELCOME TO THE PACK
           </motion.div>
-        )}
-      </AnimatePresence>
 
-      {/* Navbar */}
-      <nav className="fixed top-0 w-full z-50 bg-[#0ea5e9]/90 backdrop-blur-md border-b-4 border-black">
-        <div className="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
-          <span className="text-4xl font-bold tracking-tight text-white">SHACKO</span>
-          <MobileMenu />
+          <motion.h1 
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            className="text-7xl md:text-9xl font-[Bangers] text-[#0ea5e9] leading-[0.8] mb-8 uppercase italic"
+          >
+            CHOMP. COLLECT. <span className="text-slate-800">SHACKO.</span>
+          </motion.h1>
+
+          <motion.div
+            initial={{ opacity: 0, y: 40 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.2 }}
+            className="relative w-full max-w-5xl"
+          >
+            <img src={heroImage} alt="New Shacko Hero" className="w-full h-auto drop-shadow-2xl hover:scale-[1.02] transition-transform duration-700" />
+          </motion.div>
         </div>
-      </nav>
-
-      {/* Hero */}
-      <section className="relative pt-28 pb-8 px-6 min-h-screen flex flex-col items-center justify-center">
-        <motion.div
-          initial={{ y: -50, opacity: 0 }}
-          animate={{ y: 0, opacity: 1 }}
-          transition={{ duration: 0.6 }}
-          className="text-center z-10 mb-4"
-        >
-          <h1 className="text-[4rem] sm:text-[6rem] md:text-[8rem] lg:text-[10rem] font-[Bangers] text-white leading-[0.85] tracking-tight">
-            <span className="block text-stroke">CHOMP.</span>
-            <span className="block text-stroke">COLLECT.</span>
-            <span className="block text-[#1e3a5f] text-stroke">SHACKO.</span>
-          </h1>
-        </motion.div>
-
-        <motion.div
-          initial={{ y: 100, opacity: 0 }}
-          animate={{ y: 0, opacity: 1 }}
-          transition={{ duration: 0.8, delay: 0.3 }}
-          className="relative z-10 w-full max-w-4xl mx-auto"
-        >
-          <img
-            src={heroImage}
-            alt="Shacko Characters"
-            className="w-full h-auto object-contain drop-shadow-2xl"
-          />
-        </motion.div>
-
-        <motion.div
-          className="mt-8 z-10"
-          animate={{ y: [0, 10, 0] }}
-          transition={{ duration: 1.5, repeat: Infinity }}
-        >
-          <ComicButton size="lg" onClick={scrollToVibes}>
-            Explore the Ocean
-          </ComicButton>
-        </motion.div>
       </section>
 
-      {/* Marquee */}
-      <div className="bg-[#1e293b] border-y-4 border-black py-4 overflow-hidden">
-        <motion.div
-          animate={{ x: ["0%", "-50%"] }}
-          transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
-          className="flex whitespace-nowrap"
-        >
-          {[...Array(10)].map((_, i) => (
-            <span key={i} className="text-3xl font-[Bangers] text-white mx-8">
-              THE CHOMP NEVER ENDS <span className="text-[#38bdf8]">SHACKO</span>
-            </span>
-          ))}
-        </motion.div>
-      </div>
+      {/* 2. THE DEEP (Intro Section) */}
+      <section className="py-24 bg-white border-y border-slate-100">
+        <div className="max-w-4xl mx-auto px-6 text-center">
+          <h2 className="text-5xl md:text-7xl font-[Bangers] text-slate-800 mb-8 italic">THE DEEP</h2>
+          <p className="text-xl md:text-2xl text-slate-600 font-medium leading-relaxed">
+            <span className="text-[#0ea5e9] font-bold">888 unique 2D sharks</span>, meticulously designed with bold personalities and rare traits. 
+            Shacko merges art, community, and culture into a thriving world of fins, mischief, and ocean vibes.
+          </p>
+        </div>
+      </section>
 
-      {/* Wallet Checker */}
-      <section
-        id="whitelist-checker"
-        className="relative py-32 bg-[#0ea5e9] border-y-4 border-black overflow-hidden"
-      >
-        <div
-          className="absolute inset-0 opacity-10"
-          style={{
-            backgroundImage: "radial-gradient(circle, #ffffff 2px, transparent 2px)",
+      {/* 3. AZUKI-STYLE COLLECTION SCROLL */}
+      <section className="py-20 bg-slate-50 overflow-hidden flex flex-col gap-6">
+        {/* Top Row: Left to Right */}
+        <div className="flex">
+          <motion.div 
+            animate={{ x: [0, -1920] }} 
+            transition={{ duration: 40, repeat: Infinity, ease: "linear" }}
+            className="flex gap-6 whitespace-nowrap"
+          >
+            {[...topRow, ...topRow].map((src, i) => (
+              <img key={i} src={src} className="w-48 h-48 rounded-[2rem] border-4 border-white shadow-md object-cover" alt="Shacko NFT" />
+            ))}
+          </motion.div>
+        </div>
+        {/* Bottom Row: Right to Left */}
+        <div className="flex">
+          <motion.div 
+            animate={{ x: [-1920, 0] }} 
+            transition={{ duration: 40, repeat: Infinity, ease: "linear" }}
+            className="flex gap-6 whitespace-nowrap"
+          >
+            {[...bottomRow, ...bottomRow].map((src, i) => (
+              <img key={i} src={src} className="w-48 h-48 rounded-[2rem] border-4 border-white shadow-md object-cover" alt="Shacko NFT" />
+            ))}
+          </motion.div>
+        </div>
+      </section>
+
+      {/* 4. WORLD BUILDING */}
+      <section className="py-24 px-6 max-w-7xl mx-auto">
+        <div className="bg-[#0ea5e9] rounded-[3rem] overflow-hidden flex flex-col md:flex-row items-center shadow-2xl">
+          <div className="md:w-1/2 p-12 lg:p-20 text-white">
+            <h2 className="text-5xl md:text-7xl font-[Bangers] mb-6 italic">A world where every shark has a story</h2>
+            <p className="text-xl opacity-90 mb-10 font-medium">Dive into the lore of Shacko and discover how the pack took over the ocean.</p>
+            <Link href="/lore">
+              <button className="bg-white text-[#0ea5e9] px-10 py-5 rounded-full font-black uppercase text-xl shadow-[0_6px_0_0_#cbd5e1] hover:translate-y-1 hover:shadow-none transition-all">
+                Enter The Lore
+              </button>
+            </Link>
+          </div>
+          <div className="md:w-1/2 p-6">
+            <img src={worldBuildingImage} alt="Lore Image" className="w-full h-auto rounded-[2rem]" />
+          </div>
+        </div>
+      </section>
+
+      {/* 5. ROADMAP & GALLERY CTAs */}
+      <section className="py-24 px-6 max-w-7xl mx-auto grid md:grid-cols-2 gap-10">
+        <Link href="/roadmap">
+          <div className="group cursor-pointer bg-white p-8 rounded-[3rem] border border-slate-100 shadow-sm hover:shadow-xl transition-all">
+            <img src={roadmapThumbnail} alt="Roadmap" className="w-full h-64 object-cover rounded-[2rem] mb-8" />
+            <h3 className="text-4xl font-[Bangers] text-slate-800 italic uppercase">The Roadmap</h3>
+            <p className="text-slate-500 font-bold">See where the chomp leads next →</p>
+          </div>
+        </Link>
+        <Link href="/gallery">
+          <div className="group cursor-pointer bg-white p-8 rounded-[3rem] border border-slate-100 shadow-sm hover:shadow-xl transition-all flex flex-col justify-center text-center">
+            <div className="aspect-square bg-slate-100 rounded-[2rem] flex items-center justify-center mb-8">
+               <span className="text-8xl">🖼️</span>
+            </div>
+            <h3 className="text-4xl font-[Bangers] text-[#0ea5e9] italic uppercase">The Gallery</h3>
+            <p className="text-slate-500 font-bold">Browse the full 888 collection →</p>
+          </div>
+        </Link>
+      </section>
+
+      {/* 6. MEET THE SQUAD (Now at bottom) */}
+      <section className="py-24 px-6 bg-slate-50 border-t border-slate-100">
+        <div className="max-w-7xl mx-auto">
+          <div className="text-center mb-16">
+            <h2 className="text-5xl md:text-7xl font-[Bangers] text-slate-800 italic">MEET THE SQUAD</h2>
+            <p className="text-xl font-bold text-slate-400">THE CREW MAKING THE OCEAN SHAKE</p>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            {team.map((member, i) => (
+              <div key={i} className="bg-white p-6 rounded-[2.5rem] shadow-sm border border-slate-100 text-center">
+                <img src={member.image} className="w-full aspect-square object-cover rounded-[2rem] mb-6 border-4 border-slate-50" alt={member.name} />
+                <h4 className="text-3xl font-[Bangers] text-[#0ea5e9] uppercase italic">{member.name}</h4>
+                <p className="font-black text-slate-800 text-sm mb-2">{member.role}</p>
+                <p className="text-slate-500 text-sm italic">{member.bio}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <Footer />
+    </div>
+  );
+}
+e: "radial-gradient(circle, #ffffff 2px, transparent 2px)",
             backgroundSize: "30px 30px",
           }}
         />
