@@ -293,10 +293,10 @@ export default function Arcade() {
                     textShadow: "0 0 40px rgba(0,217,255,1), 0 0 80px rgba(0,217,255,0.6)",
                   }}
                 >
-                  000000
+                  0000
                 </div>
                 <p className="text-xl text-gray-400 uppercase tracking-widest">
-                  — Awaiting First Player —
+                  — READY PLAYER ONE—
                 </p>
               </div>
 
