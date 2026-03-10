@@ -1,12 +1,10 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { FloatingSharks } from "@/components/FloatingSharks";
-import MobileMenu from "@/components/MobileMenu"; // default import
+import Header from "@/components/Header";
 import { Footer } from "@/components/Footer";
-import { Mail, X, Globe } from "lucide-react";
+import { Mail, ShoppingBag, Package, Shirt, Image, Gift } from "lucide-react";
 import { useState } from "react";
-import logoImage from "@assets/logo-shark.png";
 
 export default function Shop() {
   const [email, setEmail] = useState("");
@@ -15,60 +13,60 @@ export default function Shop() {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (email.trim()) {
-      // TODO: connect to real newsletter service (Mailchimp, etc.)
       setSubmitted(true);
       setEmail("");
     }
   };
 
+  const shopItems = [
+    {
+      icon: Shirt,
+      title: "Exclusive Merch",
+      desc: "Hoodies, tees, hats, and accessories featuring your favorite sharks",
+      gradient: "from-[#0ea5e9] to-[#38bdf8]",
+    },
+    {
+      icon: Image,
+      title: "Digital Drops",
+      desc: "Limited edition wallpapers, PFPs, and animated shark content",
+      gradient: "from-[#ec4899] to-[#f97316]",
+    },
+    {
+      icon: Gift,
+      title: "Real-World Perks",
+      desc: "Physical collectibles, event access, and exclusive partner collabs",
+      gradient: "from-[#10b981] to-[#14b8a6]",
+    },
+  ];
+
   return (
-    <div className="min-h-screen bg-gradient-to-b from-[#0ea5e9] via-[#38bdf8] to-[#7dd3fc] text-white overflow-x-hidden">
-      <FloatingSharks />
-
-      {/* Navbar */}
-      <nav className="fixed top-0 w-full z-50 bg-[#0ea5e9]/90 backdrop-blur-md border-b-4 border-black">
-        <div className="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
-          <div className="flex items-center gap-4">
-            <MobileMenu />
-            <span className="text-4xl font-bold tracking-tight text-white">SHACKO</span>
-          </div>
-
-          {/* Desktop links */}
-          <div className="hidden md:flex items-center gap-8">
-            <a href="/" className="text-white hover:text-[#ec4899] transition-colors font-medium">
-              Home
-            </a>
-            <a href="/about" className="text-white hover:text-[#ec4899] transition-colors font-medium">
-              About
-            </a>
-            <a href="/staking" className="text-white hover:text-[#ec4899] transition-colors font-medium">
-              Staking
-            </a>
-            <a href="/shop" className="text-[#ec4899] font-bold">
-              Shop
-            </a>
-          </div>
-        </div>
-      </nav>
+    <div className="min-h-screen bg-[#0a0e27] text-white overflow-x-hidden">
+      <Header />
 
       {/* Coming Soon Hero */}
-      <section className="pt-32 pb-20 px-6">
-        <div className="max-w-5xl mx-auto text-center">
+      <section className="pt-40 pb-20 px-6 bg-gradient-to-b from-[#0a0e27] to-[#1a1f3a]">
+        <div className="max-w-6xl mx-auto text-center">
           <motion.div
             initial={{ opacity: 0, y: 40 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8 }}
-            className="inline-flex items-center gap-3 bg-black/20 backdrop-blur-sm px-6 py-3 rounded-full mb-8 border border-white/20"
+            className="inline-flex items-center gap-3 bg-gradient-to-r from-[#10b981]/20 to-[#14b8a6]/20 backdrop-blur-sm px-8 py-4 rounded-full mb-8 border-2 border-[#10b981]/30"
           >
-            <span className="text-2xl">🦈</span>
-            <span className="text-lg font-bold uppercase tracking-wider">Shop</span>
+            <ShoppingBag className="w-8 h-8 text-[#10b981]" />
+            <span className="text-2xl font-black text-[#10b981]" style={{ fontFamily: "'Bebas Neue', 'Impact', sans-serif" }}>
+              SHACKO SHOP
+            </span>
           </motion.div>
 
           <motion.h1
             initial={{ opacity: 0, y: 40 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.2 }}
-            className="text-6xl md:text-9xl font-[Bangers] text-white text-stroke mb-6 leading-tight"
+            className="text-[15vw] md:text-[150px] font-black text-transparent bg-clip-text bg-gradient-to-r from-[#10b981] to-[#14b8a6] leading-none mb-8"
+            style={{
+              fontFamily: "'Bebas Neue', 'Impact', sans-serif",
+              WebkitTextStroke: "2px rgba(16, 185, 129, 0.3)",
+            }}
           >
             COMING SOON
           </motion.h1>
@@ -77,9 +75,9 @@ export default function Shop() {
             initial={{ opacity: 0, y: 40 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.4 }}
-            className="text-xl md:text-3xl text-white/90 mb-12 max-w-3xl mx-auto"
+            className="text-2xl md:text-3xl text-gray-300 font-bold mb-12 max-w-4xl mx-auto"
           >
-            The SHACKO Shop is getting ready to drop the dopest merch, digital collectibles, exclusive drops, and maybe even real-world shark plushies.
+            The SHACKO Shop is getting ready to drop exclusive merch, digital collectibles, and real-world perks
           </motion.p>
 
           {/* Newsletter Signup */}
@@ -90,96 +88,170 @@ export default function Shop() {
             className="max-w-lg mx-auto"
           >
             {submitted ? (
-              <div className="bg-white/20 backdrop-blur-md border-2 border-[#0ea5e9] rounded-2xl p-8 text-center">
-                <h3 className="text-3xl font-[Bangers] text-white mb-4">You're in the school! 🦈</h3>
-                <p className="text-lg text-white/90">
-                  We'll notify you the second the shop launches. Get ready to chomp!
+              <div className="bg-gradient-to-br from-[#10b981] to-[#14b8a6] backdrop-blur-md border-4 border-black rounded-3xl p-10 text-center shadow-2xl">
+                <div className="w-20 h-20 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center mx-auto mb-6 border-4 border-white/40">
+                  <Mail size={40} className="text-white" />
+                </div>
+                <h3
+                  className="text-4xl font-black text-white mb-4"
+                  style={{ fontFamily: "'Bebas Neue', 'Impact', sans-serif" }}
+                >
+                  You're on the List!
+                </h3>
+                <p className="text-xl text-white/90 font-semibold">
+                  We'll notify you the second the shop launches. Get ready!
                 </p>
               </div>
             ) : (
-              <form onSubmit={handleSubmit} className="flex flex-col sm:flex-row gap-4">
-                <input
-                  type="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  placeholder="your@email.com"
-                  required
-                  className="flex-1 h-14 px-6 rounded-xl border-4 border-black bg-white/10 backdrop-blur-sm text-white placeholder:text-white/60 focus:outline-none focus:ring-2 focus:ring-[#ec4899]"
-                />
-                <button
-                  type="submit"
-                  className="h-14 px-10 bg-[#ec4899] text-white font-[Bangers] text-xl rounded-xl border-4 border-black hover:bg-[#ec4899]/90 hover:scale-105 transition-all"
+              <div className="bg-gradient-to-br from-[#1a3a52] to-[#0f1729] border-4 border-black rounded-3xl p-8 shadow-2xl">
+                <h3
+                  className="text-3xl font-black text-white mb-6 text-center"
+                  style={{ fontFamily: "'Bebas Neue', 'Impact', sans-serif" }}
                 >
-                  Notify Me
-                </button>
-              </form>
+                  Get Notified at Launch
+                </h3>
+                <form onSubmit={handleSubmit} className="flex flex-col sm:flex-row gap-4">
+                  <input
+                    type="email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    placeholder="your@email.com"
+                    required
+                    className="flex-1 h-16 px-6 rounded-xl border-4 border-[#10b981] bg-black/60 text-white placeholder:text-gray-500 focus:outline-none focus:ring-4 focus:ring-[#10b981]/50 font-bold text-lg"
+                  />
+                  <button
+                    type="submit"
+                    className="h-16 px-10 bg-gradient-to-r from-[#10b981] to-[#14b8a6] text-white font-black text-xl rounded-xl border-4 border-black hover:scale-105 transition-all shadow-lg"
+                    style={{ fontFamily: "'Bebas Neue', 'Impact', sans-serif" }}
+                  >
+                    Notify Me
+                  </button>
+                </form>
+              </div>
             )}
-          </motion.div>
-
-          {/* Social Teaser */}
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 1 }}
-            className="mt-16 flex flex-wrap justify-center gap-6"
-          >
-            <a
-              href="https://discord.gg/dfxMGDTnpM"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex items-center gap-3 bg-white/10 backdrop-blur-sm px-6 py-4 rounded-xl border-2 border-white/20 hover:border-[#0ea5e9] transition-all"
-            >
-              <X className="w-6 h-6" />
-              <span className="font-medium">Follow on X</span>
-            </a>
-            <a
-              href="https://discord.gg/dfxMGDTnpM"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex items-center gap-3 bg-white/10 backdrop-blur-sm px-6 py-4 rounded-xl border-2 border-white/20 hover:border-[#5865F2] transition-all"
-            >
-              <Globe className="w-6 h-6" />
-              <span className="font-medium">Join Discord</span>
-            </a>
           </motion.div>
         </div>
       </section>
 
-      {/* Sneak Peek Teaser */}
-      <section className="py-20 px-6 bg-black/20">
-        <div className="max-w-6xl mx-auto text-center">
-          <h2 className="text-4xl md:text-6xl font-[Bangers] text-white mb-12">
-            What's Coming to the Shop?
-          </h2>
+      {/* What's Coming */}
+      <section className="py-32 px-6 bg-gradient-to-b from-[#1a1f3a] to-[#2d1b4e]">
+        <div className="max-w-6xl mx-auto">
+          <motion.h2
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="text-6xl md:text-8xl font-black text-white text-center mb-16"
+            style={{ fontFamily: "'Bebas Neue', 'Impact', sans-serif" }}
+          >
+            WHAT'S COMING
+          </motion.h2>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {[
-              {
-                title: "Exclusive Merch",
-                desc: "Hoodies, tees, hats, and plush sharks with rare traits",
-              },
-              {
-                title: "Digital Drops",
-                desc: "Limited edition wallpapers, PFPs, and animated shark clips",
-              },
-              {
-                title: "Real-World Perks",
-                desc: "Physical collectibles, events, and partner collabs",
-              },
-            ].map((item, i) => (
-              <motion.div
-                key={i}
-                initial={{ opacity: 0, y: 30 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: i * 0.2 }}
-                className="bg-white/10 backdrop-blur-md border-2 border-white/20 rounded-2xl p-8 hover:border-[#ec4899] transition-all"
-              >
-                <h3 className="text-3xl font-[Bangers] text-[#0ea5e9] mb-4">{item.title}</h3>
-                <p className="text-lg text-gray-200">{item.desc}</p>
-              </motion.div>
-            ))}
+            {shopItems.map((item, i) => {
+              const Icon = item.icon;
+              return (
+                <motion.div
+                  key={i}
+                  initial={{ opacity: 0, y: 30 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: i * 0.2 }}
+                  className={`bg-gradient-to-br ${item.gradient} border-4 border-black rounded-3xl p-8 shadow-2xl hover:scale-105 transition-transform`}
+                >
+                  <div className="w-20 h-20 rounded-full bg-white/20 backdrop-blur-sm border-4 border-white/40 flex items-center justify-center mx-auto mb-6">
+                    <Icon size={40} className="text-white" />
+                  </div>
+                  <h3
+                    className="text-4xl font-black text-white text-center mb-4"
+                    style={{ fontFamily: "'Bebas Neue', 'Impact', sans-serif" }}
+                  >
+                    {item.title}
+                  </h3>
+                  <p className="text-lg text-white/90 text-center font-semibold leading-relaxed">
+                    {item.desc}
+                  </p>
+                </motion.div>
+              );
+            })}
           </div>
+        </div>
+      </section>
+
+      {/* Features Preview */}
+      <section className="py-32 px-6 bg-gradient-to-b from-[#2d1b4e] to-[#0a0e27]">
+        <div className="max-w-5xl mx-auto">
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="bg-gradient-to-br from-[#1a3a52] to-[#0f1729] border-4 border-black rounded-3xl p-12 shadow-2xl"
+          >
+            <h2
+              className="text-5xl md:text-7xl font-black text-transparent bg-clip-text bg-gradient-to-r from-[#fbbf24] to-[#f59e0b] text-center mb-12"
+              style={{ fontFamily: "'Bebas Neue', 'Impact', sans-serif" }}
+            >
+              Shop Features
+            </h2>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {[
+                { title: "Exclusive Drops", desc: "Limited edition items you can't get anywhere else" },
+                { title: "Holder Benefits", desc: "Special discounts and early access for NFT holders" },
+                { title: "Quality Merch", desc: "Premium materials and designs that actually look good" },
+                { title: "Global Shipping", desc: "We'll ship sharks to your door, wherever you are" },
+              ].map((feature, i) => (
+                <motion.div
+                  key={i}
+                  initial={{ opacity: 0, x: i % 2 === 0 ? -20 : 20 }}
+                  whileInView={{ opacity: 1, x: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: i * 0.1 }}
+                  className="bg-white/5 backdrop-blur-sm border-2 border-white/10 rounded-2xl p-6 hover:border-[#10b981] transition-all"
+                >
+                  <h3 className="text-2xl font-black text-[#10b981] mb-3">{feature.title}</h3>
+                  <p className="text-gray-300 font-semibold">{feature.desc}</p>
+                </motion.div>
+              ))}
+            </div>
+          </motion.div>
+        </div>
+      </section>
+
+      {/* Final CTA */}
+      <section className="py-32 px-6 bg-gradient-to-b from-[#0a0e27] to-[#1a1f3a]">
+        <div className="max-w-4xl mx-auto text-center">
+          <motion.div
+            initial={{ opacity: 0, scale: 0.9 }}
+            whileInView={{ opacity: 1, scale: 1 }}
+            viewport={{ once: true }}
+            className="relative"
+          >
+            <div className="absolute inset-0 bg-gradient-to-r from-[#10b981] to-[#14b8a6] blur-3xl opacity-30 rounded-3xl" />
+            
+            <div className="relative bg-gradient-to-br from-[#10b981] to-[#14b8a6] border-4 border-black rounded-3xl p-12 shadow-2xl">
+              <Package size={64} className="text-white mx-auto mb-6" />
+              <h2
+                className="text-5xl md:text-7xl font-black text-white mb-6"
+                style={{ fontFamily: "'Bebas Neue', 'Impact', sans-serif" }}
+              >
+                SHOP LAUNCHING SOON
+              </h2>
+              <p className="text-2xl text-white/90 font-bold mb-8 max-w-2xl mx-auto">
+                Sign up above to be first in line when we open the doors
+              </p>
+              <div className="flex flex-wrap gap-4 justify-center">
+                <div className="bg-white/20 backdrop-blur-sm px-6 py-3 rounded-full border-2 border-white/40">
+                  <span className="text-white font-black text-lg">Exclusive Merch</span>
+                </div>
+                <div className="bg-white/20 backdrop-blur-sm px-6 py-3 rounded-full border-2 border-white/40">
+                  <span className="text-white font-black text-lg">Digital Collectibles</span>
+                </div>
+                <div className="bg-white/20 backdrop-blur-sm px-6 py-3 rounded-full border-2 border-white/40">
+                  <span className="text-white font-black text-lg">Real-World Perks</span>
+                </div>
+              </div>
+            </div>
+          </motion.div>
         </div>
       </section>
 
