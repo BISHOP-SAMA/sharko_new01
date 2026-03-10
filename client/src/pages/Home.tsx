@@ -235,7 +235,6 @@ export default function Home() {
 
               <p className="text-gray-300 text-xl font-medium mb-8 leading-relaxed">
                 Stake your Shacko NFTs to earn $xSHACK rewards. The longer you stake, the more you earn.
-                Join the feeding frenzy and watch your rewards grow!
               </p>
 
               {/* CTA Button */}
@@ -285,9 +284,9 @@ export default function Home() {
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12">
             {[
-              { title: "Exclusive Merch", icon: "👕" },
-              { title: "Digital Drops", icon: "💎" },
-              { title: "Real World Perks", icon: "🎁" },
+              { title: "Explore", },
+              { title: "Create", },
+              { title: "Collect", },
             ].map((item, i) => (
               <motion.div
                 key={i}
