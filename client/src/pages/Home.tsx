@@ -313,7 +313,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* SHACKO HUB - GALLERY GRID */}
+      {/* SHACKO - GALLERY GRID */}
       <section className="py-32 px-6 bg-[#0a0e27] overflow-hidden">
         <div className="max-w-7xl mx-auto mb-16">
           <motion.h2
@@ -333,7 +333,7 @@ export default function Home() {
               whileTap={{ scale: 0.95 }}
               className="group flex items-center gap-3 mx-auto bg-gradient-to-r from-[#00d9ff] to-[#0ea5e9] text-black px-10 py-5 rounded-full font-black text-xl shadow-[0_0_30px_rgba(0,217,255,0.5)] hover:shadow-[0_0_50px_rgba(0,217,255,0.7)] transition-all"
             >
-              VIEW ALL PROJECTS
+              VIEW ALL COLLECTION
               <ArrowRight size={24} className="group-hover:translate-x-1 transition-transform" />
             </motion.button>
           </div>
