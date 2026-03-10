@@ -14,8 +14,6 @@ export function Footer() {
 
         {/* Tagline */}
         <p className="text-center text-gray-400 text-lg mb-8 max-w-2xl mx-auto">
-          Stake your collection. Track earnings. Claim $ASS with style.
-        </p>
 
         {/* Quick Links */}
         <div className="mb-8">
