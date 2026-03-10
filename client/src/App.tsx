@@ -10,6 +10,7 @@ import FAQ from "@/pages/FAQ";
 import Arcade from "@/pages/Arcade";
 import Lore from "@/pages/Lore";
 import Raffle from "@/pages/Raffle";
+import Roadmap from "@/pages/Roadmap";
 import Shop from "@/pages/Shop";
 import Theatre from "@/pages/Theatre";
 import NotFound from "@/pages/not-found";
@@ -28,6 +29,7 @@ function App() {
       <Route path="/arcade" component={Arcade} />
       <Route path="/lore" component={Lore} />
       <Route path="/raffle" component={Raffle} />
+      <Route path="/roadmap" component={Roadmap} />
       <Route path="/shop" component={Shop} />
       <Route path="/theatre" component={Theatre} />
 
