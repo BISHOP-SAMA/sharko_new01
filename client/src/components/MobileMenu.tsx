@@ -1,6 +1,9 @@
-import { Link } from "wouter";
+"use client";
+
+import { Link } from "wouter"; // Fixed lowercase 'import'
 import { X } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
+import { ConnectButton } from "@rainbow-me/rainbowkit";
 
 const menuLinks = [
   { name: "Home", path: "/" },
@@ -18,37 +21,58 @@ interface MobileMenuProps {
   onClose: () => void;
 }
 
-// Ensure "export default" is used here
 export default function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
   return (
     <AnimatePresence>
       {isOpen && (
         <motion.div
-          initial={{ x: "100%" }}
-          animate={{ x: 0 }}
-          exit={{ x: "100%" }}
-          transition={{ type: "spring", damping: 25, stiffness: 200 }}
-          className="fixed inset-0 z-[200] bg-[#0a0a0a] flex flex-col items-center justify-center p-6"
+          initial={{ opacity: 0, x: "100%" }}
+          animate={{ opacity: 1, x: 0 }}
+          exit={{ opacity: 0, x: "100%" }}
+          transition={{ type: "spring", damping: 30, stiffness: 300 }}
+          className="fixed inset-0 z-[200] bg-[#0a0e27]/95 backdrop-blur-xl flex flex-col p-8"
         >
-          <button 
-            onClick={onClose}
-            className="absolute top-6 right-6 p-2 bg-white border-4 border-black text-black"
-          >
-            <X size={32} strokeWidth={4} />
-          </button>
+          {/* Top Bar inside Menu */}
+          <div className="flex justify-between items-center mb-12">
+            <span className="text-2xl font-[Bangers] text-[#00d9ff] tracking-widest">MENU</span>
+            <button 
+              onClick={onClose}
+              className="p-2 rounded-xl border-2 border-[#ec4899]/50 bg-[#ec4899]/10 text-[#ec4899] hover:bg-[#ec4899] hover:text-white transition-all"
+            >
+              <X size={28} strokeWidth={3} />
+            </button>
+          </div>
 
-          <nav className="flex flex-col gap-4 w-full">
-            {menuLinks.map((link) => (
-              <Link key={link.path} href={link.path}>
-                <a 
-                  onClick={onClose}
-                  className="text-5xl font-[Bangers] italic text-white uppercase py-2 hover:text-[#fbbf24] transition-colors border-b-2 border-white/10 w-full text-center"
-                >
-                  {link.name}
-                </a>
-              </Link>
+          {/* Links Grid */}
+          <nav className="flex flex-col gap-2 overflow-y-auto">
+            {menuLinks.map((link, i) => (
+              <motion.div
+                key={link.path}
+                initial={{ opacity: 0, x: 20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: i * 0.05 }}
+              >
+                <Link href={link.path}>
+                  <a 
+                    onClick={onClose}
+                    className="group flex items-center justify-between text-5xl font-[Bangers] text-white py-3 hover:text-[#00d9ff] transition-all border-b border-white/5"
+                  >
+                    <span>{link.name}</span>
+                    <span className="text-sm opacity-0 group-hover:opacity-100 transition-opacity text-[#00d9ff]">DIVE →</span>
+                  </a>
+                </Link>
+              </motion.div>
             ))}
           </nav>
+
+          {/* Wallet Section at Bottom */}
+          <div className="mt-auto pt-8 flex flex-col items-center gap-4">
+            <div className="w-full h-[1px] bg-gradient-to-r from-transparent via-white/20 to-transparent mb-4" />
+            <p className="text-[#00d9ff] font-bold text-xs tracking-widest uppercase mb-2">Connect to the Deep</p>
+            <div className="scale-110">
+              <ConnectButton label="Connect Wallet" showBalance={false} chainStatus="icon" />
+            </div>
+          </div>
         </motion.div>
       )}
     </AnimatePresence>
