@@ -1,10 +1,9 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { FloatingSharks } from "@/components/FloatingSharks";
-import MobileMenu from "@/components/MobileMenu"; // default import
+import Header from "@/components/Header";
 import { Footer } from "@/components/Footer";
-import logoImage from "@assets/logo-shark.png";
+import { Waves, Eye, Zap } from "lucide-react";
 
 export default function Lore() {
   const loreParagraphs = [
@@ -24,80 +23,194 @@ export default function Lore() {
     "And the Shacko are coming.",
   ];
 
+  const chapters = [
+    {
+      icon: Eye,
+      title: "The Awakening",
+      description: "From the depths, they watch. From the shadows, they learn.",
+    },
+    {
+      icon: Waves,
+      title: "The Syndicate",
+      description: "888 sharks. One order. Infinite power.",
+    },
+    {
+      icon: Zap,
+      title: "The Rising",
+      description: "The surface world is about to meet the deep.",
+    },
+  ];
+
   return (
-    <div className="min-h-screen bg-gradient-to-b from-[#000814] via-[#001122] to-[#0a1f3f] text-white overflow-x-hidden relative">
-      {/* Deep ocean vignette overlay */}
-      <div className="pointer-events-none fixed inset-0 bg-gradient-to-b from-transparent via-black/40 to-black/70 z-10" />
+    <div className="min-h-screen bg-[#0a0e27] text-white overflow-x-hidden relative">
+      {/* Deep ocean ambient glow */}
+      <div className="pointer-events-none fixed inset-0 bg-[radial-gradient(ellipse_at_center,rgba(14,165,233,0.08),transparent_70%)] z-0" />
+      
+      <Header />
 
-      <FloatingSharks />
-
-      {/* Navbar */}
-      <nav className="fixed top-0 w-full z-50 bg-[#000814]/90 backdrop-blur-md border-b border-[#0ea5e9]/20">
-        <div className="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
-          <div className="flex items-center gap-4">
-            <MobileMenu />
-            <img src={logoImage} alt="Shacko Logo" className="w-12 h-12 object-contain" />
-            <span className="text-3xl font-[Bangers] text-white tracking-wider">SHACKO</span>
-          </div>
-
-          {/* Desktop links */}
-          <div className="hidden md:flex items-center gap-8">
-            <a href="/" className="hover:text-[#0ea5e9] transition-colors">Home</a>
-            <a href="/about" className="hover:text-[#0ea5e9] transition-colors">About</a>
-            <a href="/staking" className="hover:text-[#0ea5e9] transition-colors">Staking</a>
-            <a href="/lore" className="text-[#0ea5e9] font-bold">Lore</a>
-          </div>
-        </div>
-      </nav>
-
-      {/* Lore Content */}
-      <section className="pt-32 pb-24 px-6">
-        <div className="max-w-4xl mx-auto">
-          <motion.h1
-            initial={{ opacity: 0, y: 60 }}
+      {/* Hero Section */}
+      <section className="relative pt-40 pb-20 px-6 bg-gradient-to-b from-[#0a0e27] to-[#1a1f3a]">
+        <div className="max-w-7xl mx-auto text-center">
+          <motion.div
+            initial={{ opacity: 0, y: 50 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 1.2 }}
-            className="text-6xl md:text-9xl font-[Bangers] text-center text-white mb-16 tracking-tight drop-shadow-2xl"
+            transition={{ duration: 1 }}
+            className="mb-12"
           >
-            THE <span className="text-[#0ea5e9]">LORE</span>
-          </motion.h1>
+            <div className="inline-flex items-center gap-3 bg-gradient-to-r from-[#0ea5e9]/20 to-[#ec4899]/20 backdrop-blur-sm px-8 py-4 rounded-full mb-8 border-2 border-[#00d9ff]/30">
+              <span className="text-2xl">📜</span>
+              <span className="text-2xl font-black text-[#00d9ff]" style={{ fontFamily: "'Bebas Neue', 'Impact', sans-serif" }}>
+                THE LEGEND
+              </span>
+            </div>
 
-          <div className="space-y-10 md:space-y-12 text-lg md:text-2xl leading-relaxed text-gray-200 font-light">
-            {loreParagraphs.map((paragraph, index) => (
-              <motion.p
+            <h1
+              className="text-[15vw] md:text-[150px] font-black text-transparent bg-clip-text bg-gradient-to-r from-[#00d9ff] via-[#0ea5e9] to-[#ec4899] leading-none mb-8"
+              style={{
+                fontFamily: "'Bebas Neue', 'Impact', sans-serif",
+                textShadow: "0 0 80px rgba(0, 217, 255, 0.5)",
+              }}
+            >
+              THE LORE
+            </h1>
+
+            <p className="text-2xl md:text-3xl text-gray-400 font-bold max-w-3xl mx-auto">
+              From the depths they came. To the depths they return.
+            </p>
+          </motion.div>
+        </div>
+      </section>
+
+      {/* Chapter Icons */}
+      <section className="py-20 px-6 bg-gradient-to-b from-[#1a1f3a] to-[#2d1b4e]">
+        <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-8">
+          {chapters.map((chapter, index) => {
+            const Icon = chapter.icon;
+            return (
+              <motion.div
                 key={index}
-                initial={{ opacity: 0, y: 40 }}
+                initial={{ opacity: 0, y: 30 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
-                transition={{ duration: 0.9, delay: index * 0.15 }}
-                className={`${
-                  index === 2 || index === 13
-                    ? "text-3xl md:text-5xl font-[Bangers] text-[#0ea5e9] text-center tracking-wide"
-                    : ""
-                }`}
+                transition={{ delay: index * 0.2 }}
+                className="bg-gradient-to-br from-[#1a3a52] to-[#0f1729] border-2 border-[#00d9ff]/30 rounded-3xl p-8 text-center hover:border-[#00d9ff] transition-all"
               >
-                {paragraph}
-              </motion.p>
-            ))}
+                <div className="w-20 h-20 mx-auto mb-6 rounded-full bg-[#00d9ff]/20 flex items-center justify-center">
+                  <Icon size={40} className="text-[#00d9ff]" />
+                </div>
+                <h3
+                  className="text-3xl font-black text-white mb-4"
+                  style={{ fontFamily: "'Bebas Neue', 'Impact', sans-serif" }}
+                >
+                  {chapter.title}
+                </h3>
+                <p className="text-gray-400 font-semibold">{chapter.description}</p>
+              </motion.div>
+            );
+          })}
+        </div>
+      </section>
+
+      {/* Main Lore Content */}
+      <section className="py-32 px-6 bg-gradient-to-b from-[#2d1b4e] to-[#0a0e27]">
+        <div className="max-w-4xl mx-auto">
+          <div className="space-y-12 text-lg md:text-2xl leading-relaxed">
+            {loreParagraphs.map((paragraph, index) => {
+              // Highlight key phrases
+              const isKeyPhrase = index === 2 || index === 5 || index === 9 || index === 12 || index === 13;
+              
+              return (
+                <motion.p
+                  key={index}
+                  initial={{ opacity: 0, y: 40 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.8, delay: index * 0.05 }}
+                  className={
+                    isKeyPhrase
+                      ? "text-4xl md:text-6xl font-black text-transparent bg-clip-text bg-gradient-to-r from-[#00d9ff] to-[#ec4899] text-center py-8"
+                      : "text-gray-300 font-medium"
+                  }
+                  style={isKeyPhrase ? { fontFamily: "'Bebas Neue', 'Impact', sans-serif" } : {}}
+                >
+                  {paragraph}
+                </motion.p>
+              );
+            })}
           </div>
 
-          {/* Final dramatic close */}
+          {/* Dramatic Close */}
           <motion.div
             initial={{ opacity: 0, scale: 0.9 }}
             whileInView={{ opacity: 1, scale: 1 }}
             viewport={{ once: true }}
-            transition={{ duration: 1.2, delay: 2 }}
-            className="mt-20 text-center"
+            transition={{ duration: 1, delay: 0.5 }}
+            className="mt-32 text-center"
           >
-            <div className="inline-block bg-black/60 backdrop-blur-md border-2 border-[#0ea5e9]/40 rounded-2xl px-12 py-8">
-              <p className="text-3xl md:text-5xl font-[Bangers] text-[#ec4899] mb-4">
-                The deep calls.
-              </p>
-              <p className="text-xl text-gray-300">
-                Will you answer?
-              </p>
+            <div className="relative inline-block">
+              {/* Glow effect */}
+              <div className="absolute inset-0 bg-gradient-to-r from-[#ec4899] to-[#f97316] blur-3xl opacity-40 rounded-3xl" />
+              
+              <div className="relative bg-gradient-to-br from-[#1a3a52] to-[#0f1729] border-4 border-[#ec4899] rounded-3xl px-12 py-10 shadow-2xl">
+                <p
+                  className="text-5xl md:text-7xl font-black text-transparent bg-clip-text bg-gradient-to-r from-[#ec4899] to-[#f97316] mb-6"
+                  style={{ fontFamily: "'Bebas Neue', 'Impact', sans-serif" }}
+                >
+                  THE DEEP CALLS
+                </p>
+                <p className="text-2xl md:text-3xl text-gray-300 font-bold">
+                  Will you answer?
+                </p>
+              </div>
             </div>
           </motion.div>
+
+          {/* CTA Section */}
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ delay: 0.8 }}
+            className="mt-20 flex flex-col sm:flex-row gap-6 justify-center"
+          >
+            <a href="/">
+              <button className="group flex items-center gap-3 bg-gradient-to-r from-[#00d9ff] to-[#0ea5e9] text-black border-4 border-black rounded-full px-10 py-5 hover:scale-105 transition-all shadow-lg font-black text-lg">
+                <span className="text-2xl">🦈</span>
+                <span>JOIN THE ORDER</span>
+              </button>
+            </a>
+
+            <a href="/roadmap">
+              <button className="group flex items-center gap-3 bg-black text-white border-4 border-[#00d9ff] rounded-full px-10 py-5 hover:scale-105 transition-all shadow-lg font-black text-lg">
+                <span className="text-2xl">🗺️</span>
+                <span>VIEW ROADMAP</span>
+              </button>
+            </a>
+          </motion.div>
+        </div>
+      </section>
+
+      {/* Quote Section */}
+      <section className="py-32 px-6 bg-gradient-to-b from-[#0a0e27] to-[#1a1f3a]">
+        <div className="max-w-5xl mx-auto text-center">
+          <motion.blockquote
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="relative"
+          >
+            <div className="text-8xl text-[#00d9ff]/20 mb-4">"</div>
+            <p
+              className="text-3xl md:text-5xl font-black text-transparent bg-clip-text bg-gradient-to-r from-[#fbbf24] to-[#f59e0b] mb-8 italic"
+              style={{ fontFamily: "'Bebas Neue', 'Impact', sans-serif" }}
+            >
+              IN THE DEEP, WE ARE ALL EQUAL. IN THE SYNDICATE, WE ARE UNSTOPPABLE.
+            </p>
+            <div className="text-8xl text-[#00d9ff]/20 text-right">"</div>
+            <p className="text-xl text-gray-500 font-bold uppercase tracking-widest mt-8">
+              — Ancient Shacko Proverb
+            </p>
+          </motion.blockquote>
         </div>
       </section>
 
