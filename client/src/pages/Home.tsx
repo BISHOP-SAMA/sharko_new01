@@ -3,7 +3,6 @@
 import { motion } from "framer-motion";
 import Header from "@/components/Header";
 import { Footer } from "@/components/Footer";
-import { FloatingBubbles } from "@/components/FloatingBubbles";
 import { ArrowRight } from "lucide-react";
 
 // Import your images
@@ -48,9 +47,6 @@ const team = [
 export default function Home() {
   return (
     <div className="min-h-screen bg-[#0a0e27] overflow-x-hidden">
-      {/* Floating Bubbles Background Effect */}
-      <FloatingBubbles />
-      
       <Header />
 
       {/* HERO SECTION - THE DEEP */}
