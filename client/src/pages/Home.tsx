@@ -3,10 +3,11 @@
 import { motion } from "framer-motion";
 import Header from "@/components/Header";
 import { Footer } from "@/components/Footer";
+import { FloatingBubbles } from "@/components/FloatingBubbles";
 import { ArrowRight } from "lucide-react";
 
 // Import your images
-import heroImage from "@assets/New1.png";
+import heroImage from "@assets/Head.png";
 import aboutImage from "@assets/New3.png";
 import stakingImage from "@assets/New02.png";
 import raffleImage from "@assets/New2.png";
@@ -47,48 +48,13 @@ const team = [
 export default function Home() {
   return (
     <div className="min-h-screen bg-[#0a0e27] overflow-x-hidden">
+      {/* Floating Bubbles Background Effect */}
+      <FloatingBubbles />
+      
       <Header />
-
-      {/* Animated Marquee Banner */}
-      <div className="fixed top-20 left-0 right-0 bg-gradient-to-r from-[#1a1f3a] to-[#0f1729] py-3 z-40 overflow-hidden border-b-2 border-[#2a3f5f]">
-        <motion.div
-          animate={{ x: ["0%", "-50%"] }}
-          transition={{ duration: 25, repeat: Infinity, ease: "linear" }}
-          className="flex whitespace-nowrap"
-        >
-          {[...Array(10)].map((_, i) => (
-            <span key={i} className="text-xl font-bold text-[#00d9ff] mx-8">
-              DIVE INTO THE DEEP <span className="text-white">•</span> 888 SHARKS <span className="text-white">•</span>
-            </span>
-          ))}
-        </motion.div>
-      </div>
 
       {/* HERO SECTION - THE DEEP */}
       <section className="relative pt-40 pb-0 px-6 bg-gradient-to-b from-[#0a0e27] via-[#1a1f3a] to-[#0f1729] overflow-hidden">
-        {/* Animated background particles */}
-        <div className="absolute inset-0 overflow-hidden pointer-events-none opacity-30">
-          {[...Array(50)].map((_, i) => (
-            <motion.div
-              key={i}
-              className="absolute w-1 h-1 bg-[#00d9ff] rounded-full"
-              style={{
-                left: `${Math.random() * 100}%`,
-                top: `${Math.random() * 100}%`,
-              }}
-              animate={{
-                y: [0, Math.random() * 100 - 50],
-                x: [0, Math.random() * 100 - 50],
-              }}
-              transition={{
-                duration: Math.random() * 20 + 10,
-                repeat: Infinity,
-                ease: "linear",
-              }}
-            />
-          ))}
-        </div>
-
         <div className="max-w-7xl mx-auto text-center relative z-10">
           {/* THE DEEP Title */}
           <motion.h1
