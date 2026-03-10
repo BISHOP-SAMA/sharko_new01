@@ -6,7 +6,7 @@ import { Footer } from "@/components/Footer";
 import { ArrowRight } from "lucide-react";
 
 // Import your images
-import heroImage from "@assets/Head.png";
+import heroImage from "@assets/New1.png";
 import aboutImage from "@assets/New3.png";
 import stakingImage from "@assets/New02.png";
 import raffleImage from "@assets/New2.png";
