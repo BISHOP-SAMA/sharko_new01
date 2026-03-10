@@ -8,7 +8,7 @@ import { ArrowRight } from "lucide-react";
 // Import your images
 import heroImage from "@assets/New1.png";
 import aboutImage from "@assets/New3.png";
-import stakingImage from "@assets/New02.png";
+import stakingImage from "@assets/New03.png";
 import raffleImage from "@assets/New2.png";
 
 // Generate paths for gallery grid (1.jpg to 30.jpg)
