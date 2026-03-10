@@ -462,7 +462,7 @@ export default function Home() {
             >
               <div className="absolute inset-0 bg-black/20 group-hover:bg-black/0 transition-all" />
               <div className="relative z-10">
-                <div className="text-6xl mb-4">🎬</div>
+                <div className="text-6xl mb-4"></div>
                 <h3 className="text-4xl font-black text-white mb-4">SHACKO THEATRE</h3>
                 <p className="text-white/90 font-medium">Immersive storytelling and animated lore</p>
                 <div className="mt-6 inline-block bg-black/30 backdrop-blur-sm text-white px-6 py-2 rounded-full font-bold text-sm">
@@ -481,7 +481,7 @@ export default function Home() {
             >
               <div className="absolute inset-0 bg-black/20 group-hover:bg-black/0 transition-all" />
               <div className="relative z-10">
-                <div className="text-6xl mb-4">🚀</div>
+                <div className="text-6xl mb-4"></div>
                 <h3 className="text-4xl font-black text-white mb-4">SHACKO PUMP</h3>
                 <p className="text-white/90 font-medium">Trade, compete, and ride the waves</p>
                 <div className="mt-6 inline-block bg-black/30 backdrop-blur-sm text-white px-6 py-2 rounded-full font-bold text-sm">
@@ -501,7 +501,7 @@ export default function Home() {
               <a href="/staking" className="block">
                 <div className="absolute inset-0 bg-black/20 group-hover:bg-black/0 transition-all" />
                 <div className="relative z-10">
-                  <div className="text-6xl mb-4">🦈</div>
+                  <div className="text-6xl mb-4"></div>
                   <h3 className="text-4xl font-black text-black mb-4">STAKING</h3>
                   <p className="text-black/90 font-medium">Earn rewards by staking your Shackos</p>
                   <div className="mt-6 flex items-center gap-2 text-black font-black">
