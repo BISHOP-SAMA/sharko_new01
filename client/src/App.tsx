@@ -1,5 +1,6 @@
 import React from "react";
 import { Route, Switch } from "wouter";
+import { FloatingBubbles } from "@/components/FloatingBubbles";
 
 // Page Imports
 import Home from "@/pages/Home";
@@ -17,25 +18,30 @@ import NotFound from "@/pages/not-found";
 
 function App() {
   return (
-    <Switch>
-      {/* Primary Routes */}
-      <Route path="/" component={Home} />
-      <Route path="/about" component={About} />
-      <Route path="/staking" component={Staking} />
-      <Route path="/rewards" component={Rewards} />
-      <Route path="/faq" component={FAQ} />
+    <>
+      {/* Global Floating Bubbles - appears on all pages */}
+      <FloatingBubbles />
       
-      {/* Project Expansion Routes */}
-      <Route path="/arcade" component={Arcade} />
-      <Route path="/lore" component={Lore} />
-      <Route path="/raffle" component={Raffle} />
-      <Route path="/roadmap" component={Roadmap} />
-      <Route path="/shop" component={Shop} />
-      <Route path="/theatre" component={Theatre} />
+      <Switch>
+        {/* Primary Routes */}
+        <Route path="/" component={Home} />
+        <Route path="/about" component={About} />
+        <Route path="/staking" component={Staking} />
+        <Route path="/rewards" component={Rewards} />
+        <Route path="/faq" component={FAQ} />
+        
+        {/* Project Expansion Routes */}
+        <Route path="/arcade" component={Arcade} />
+        <Route path="/lore" component={Lore} />
+        <Route path="/raffle" component={Raffle} />
+        <Route path="/roadmap" component={Roadmap} />
+        <Route path="/shop" component={Shop} />
+        <Route path="/theatre" component={Theatre} />
 
-      {/* 404 fallback using your dedicated not-found component */}
-      <Route component={NotFound} />
-    </Switch>
+        {/* 404 fallback using your dedicated not-found component */}
+        <Route component={NotFound} />
+      </Switch>
+    </>
   );
 }
 
