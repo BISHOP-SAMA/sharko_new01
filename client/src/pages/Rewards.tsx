@@ -263,7 +263,7 @@ export default function Rewards() {
                 className="text-6xl md:text-8xl font-black text-black mb-6"
                 style={{ fontFamily: "'Bebas Neue', 'Impact', sans-serif" }}
               >
-                READY TO EARN? 🦈
+                READY TO EARN? 
               </h2>
               
               <p className="text-2xl md:text-3xl text-black/90 font-bold mb-12 max-w-2xl mx-auto">
