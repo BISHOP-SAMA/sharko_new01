@@ -1,12 +1,10 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { FloatingSharks } from "@/components/FloatingSharks";
-import MobileMenu from "@/components/MobileMenu"; // default import
+import Header from "@/components/Header";
 import { Footer } from "@/components/Footer";
-import { Gamepad2, Trophy, Zap, Coins } from "lucide-react";
+import { Gamepad2, Trophy, Zap, Coins, Star, Sparkles } from "lucide-react";
 import { useState } from "react";
-import logoImage from "@assets/logo-shark.png";
 
 export default function Arcade() {
   const [email, setEmail] = useState("");
@@ -15,7 +13,6 @@ export default function Arcade() {
   const handleSubscribe = (e: React.FormEvent) => {
     e.preventDefault();
     if (email.trim()) {
-      // TODO: connect to real newsletter (e.g. Mailchimp API)
       setSubscribed(true);
       setEmail("");
     }
@@ -23,93 +20,141 @@ export default function Arcade() {
 
   const games = [
     {
-      title: "Shark Chomp",
-      description: "Eat fish, avoid hooks, get bigger — classic arcade style",
+      title: "SHARK CHOMP",
+      description: "Eat fish, dodge obstacles, grow bigger. Classic arcade action with a bite!",
       status: "Coming Soon",
       icon: <Gamepad2 className="w-10 h-10" />,
+      color: "from-[#0ea5e9] to-[#38bdf8]",
     },
     {
-      title: "Pump Runner",
-      description: "Endless runner with SHACKO pumps & power-ups",
-      status: "In Development",
+      title: "PUMP RUNNER",
+      description: "Endless runner through the ocean. Collect $SHACK and power-ups!",
+      status: "Coming Soon",
       icon: <Zap className="w-10 h-10" />,
+      color: "from-[#fbbf24] to-[#f59e0b]",
     },
     {
-      title: "Shark Royale",
-      description: "Battle royale — last shark swimming wins the pot",
-      status: "Planned",
+      title: "SHARK ROYALE",
+      description: "Battle royale — last shark swimming wins the prize pool!",
+      status: "Coming Soon",
       icon: <Trophy className="w-10 h-10" />,
+      color: "from-[#ec4899] to-[#f97316]",
+    },
+    {
+      title: "COIN FRENZY",
+      description: "Catch falling $SHACK tokens before time runs out. Fast-paced arcade fun!",
+      status: "Coming Soon",
+      icon: <Coins className="w-10 h-10" />,
+      color: "from-[#10b981] to-[#14b8a6]",
+    },
+    {
+      title: "DEEP DIVE",
+      description: "Dive deeper, collect treasures, avoid dangers. How far can you go?",
+      status: "Coming Soon",
+      icon: <Star className="w-10 h-10" />,
+      color: "from-[#8b5cf6] to-[#7c3aed]",
+    },
+    {
+      title: "SHARK DASH",
+      description: "Speed through underwater tunnels. Precision timing and reflexes required!",
+      status: "Coming Soon",
+      icon: <Sparkles className="w-10 h-10" />,
+      color: "from-[#f59e0b] to-[#d97706]",
     },
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-[#0f172a] via-[#1e293b] to-[#0f172a] text-white overflow-x-hidden relative">
-      {/* Scanline overlay for arcade feel */}
-      <div className="pointer-events-none fixed inset-0 bg-[linear-gradient(rgba(0,0,0,0.1)_50%,transparent_50%)] bg-[length:100%_6px] opacity-30 z-30" />
+    <div className="min-h-screen bg-[#0a0e27] text-white overflow-x-hidden relative">
+      {/* Retro Scanline Effect */}
+      <div className="pointer-events-none fixed inset-0 bg-[repeating-linear-gradient(0deg,rgba(0,217,255,0.03)_0px,rgba(0,217,255,0.03)_1px,transparent_1px,transparent_2px)] z-[60]" />
+      
+      {/* CRT Glow */}
+      <div className="pointer-events-none fixed inset-0 bg-[radial-gradient(ellipse_at_center,rgba(14,165,233,0.15),transparent_70%)] z-[59]" />
 
-      <FloatingSharks />
+      <Header />
 
-      {/* Navbar */}
-      <nav className="fixed top-0 w-full z-50 bg-[#0f172a]/90 backdrop-blur-md border-b border-[#0ea5e9]/30">
-        <div className="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
-          <div className="flex items-center gap-4">
-            <MobileMenu />
-            <img src={logoImage} alt="Shacko Logo" className="w-12 h-12 object-contain" />
-            <span className="text-3xl font-[Bangers] text-white tracking-wider">SHACKO</span>
-          </div>
+      {/* Pixelated Border Top */}
+      <div className="fixed top-20 left-0 right-0 h-1 bg-gradient-to-r from-transparent via-[#00d9ff] to-transparent z-40" />
 
-          {/* Desktop links */}
-          <div className="hidden md:flex items-center gap-8">
-            <a href="/" className="hover:text-[#0ea5e9] transition-colors">Home</a>
-            <a href="/about" className="hover:text-[#0ea5e9] transition-colors">About</a>
-            <a href="/staking" className="hover:text-[#0ea5e9] transition-colors">Staking</a>
-            <a href="/arcade" className="text-[#0ea5e9] font-bold">Arcade</a>
-          </div>
+      {/* Hero Section */}
+      <section className="pt-40 pb-20 px-6 relative">
+        {/* Neon Grid Background */}
+        <div className="absolute inset-0 opacity-10">
+          <div className="absolute inset-0" style={{
+            backgroundImage: `
+              linear-gradient(rgba(0, 217, 255, 0.3) 1px, transparent 1px),
+              linear-gradient(90deg, rgba(0, 217, 255, 0.3) 1px, transparent 1px)
+            `,
+            backgroundSize: '50px 50px',
+          }} />
         </div>
-      </nav>
 
-      {/* Hero */}
-      <section className="pt-32 pb-16 px-6">
-        <div className="max-w-5xl mx-auto text-center">
+        <div className="max-w-6xl mx-auto text-center relative z-10">
+          {/* Arcade Token Badge */}
           <motion.div
-            initial={{ opacity: 0, scale: 0.9 }}
+            initial={{ opacity: 0, scale: 0.5 }}
             animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.8 }}
-            className="inline-flex items-center gap-3 bg-black/40 backdrop-blur-md px-8 py-4 rounded-full mb-8 border border-[#0ea5e9]/40"
+            transition={{ duration: 0.5, type: "spring" }}
+            className="inline-flex items-center gap-3 bg-gradient-to-r from-[#00d9ff] to-[#0ea5e9] px-8 py-4 rounded-full mb-8 border-4 border-black shadow-[0_0_30px_rgba(0,217,255,0.6)]"
           >
-            <Gamepad2 className="w-8 h-8 text-[#0ea5e9]" />
-            <span className="text-2xl font-[Bangers] text-[#0ea5e9]">ARCADE</span>
+            <Gamepad2 className="w-8 h-8 text-black" />
+            <span className="text-2xl font-black text-black" style={{ fontFamily: "'Bebas Neue', 'Impact', sans-serif" }}>
+              SHACKO ARCADE
+            </span>
           </motion.div>
 
+          {/* Main Title */}
           <motion.h1
-            initial={{ opacity: 0, y: 40 }}
+            initial={{ opacity: 0, y: 50 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.2 }}
-            className="text-6xl md:text-9xl font-[Bangers] text-white mb-6 tracking-tight drop-shadow-[0_8px_8px_rgba(0,0,0,0.6)]"
+            className="text-[20vw] md:text-[180px] font-black leading-none mb-8"
+            style={{
+              fontFamily: "'Bebas Neue', 'Impact', sans-serif",
+              background: "linear-gradient(180deg, #00d9ff 0%, #0ea5e9 50%, #ec4899 100%)",
+              WebkitBackgroundClip: "text",
+              WebkitTextFillColor: "transparent",
+              textShadow: "0 0 40px rgba(0,217,255,0.8), 0 0 80px rgba(236,72,153,0.6)",
+            }}
           >
-            INSERT <span className="text-[#0ea5e9]">COIN</span>
+            INSERT COIN
           </motion.h1>
 
+          {/* Subtitle */}
           <motion.p
-            initial={{ opacity: 0, y: 40 }}
+            initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.4 }}
-            className="text-xl md:text-3xl text-gray-300 max-w-3xl mx-auto mb-12"
+            className="text-2xl md:text-4xl text-[#00d9ff] font-bold max-w-4xl mx-auto mb-4"
+            style={{
+              textShadow: "0 0 20px rgba(0,217,255,0.8)",
+            }}
           >
-            Play, win, earn $ASS tokens. Coming soon — bite-sized shark chaos.
+            PLAY • WIN • EARN $SHACK
+          </motion.p>
+
+          <motion.p
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.6 }}
+            className="text-xl text-gray-400 mb-12"
+          >
+            Retro arcade games meet Web3 rewards. Coming soon to the deep.
           </motion.p>
 
           {/* Newsletter */}
           <motion.div
-            initial={{ opacity: 0, y: 40 }}
+            initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.6 }}
+            transition={{ duration: 0.8, delay: 0.8 }}
             className="max-w-md mx-auto"
           >
             {subscribed ? (
-              <div className="bg-[#0ea5e9]/20 border-2 border-[#0ea5e9] rounded-2xl p-8 text-center">
-                <h3 className="text-3xl font-[Bangers] text-white mb-4">You're in the high score list!</h3>
-                <p className="text-lg text-gray-200">We'll ping you when the games drop. Get ready to chomp!</p>
+              <div className="bg-gradient-to-r from-[#10b981] to-[#14b8a6] border-4 border-black rounded-2xl p-8 text-center shadow-[0_0_40px_rgba(16,185,129,0.6)]">
+                <h3 className="text-3xl font-black text-black mb-4" style={{ fontFamily: "'Bebas Neue', 'Impact', sans-serif" }}>
+                  PLAYER 1 READY!
+                </h3>
+                <p className="text-lg text-black font-bold">You're on the waitlist. Get ready to chomp!</p>
               </div>
             ) : (
               <form onSubmit={handleSubscribe} className="flex flex-col sm:flex-row gap-4">
@@ -119,13 +164,15 @@ export default function Arcade() {
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="your@email.com"
                   required
-                  className="flex-1 h-14 px-6 rounded-xl border-4 border-black bg-black/40 text-white placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-[#0ea5e9]"
+                  className="flex-1 h-16 px-6 rounded-xl border-4 border-[#00d9ff] bg-black/80 text-white placeholder:text-gray-500 focus:outline-none focus:ring-4 focus:ring-[#00d9ff]/50 font-bold"
+                  style={{ boxShadow: "inset 0 0 20px rgba(0,217,255,0.2)" }}
                 />
                 <button
                   type="submit"
-                  className="h-14 px-10 bg-[#0ea5e9] text-black font-[Bangers] text-xl rounded-xl border-4 border-black hover:bg-[#0ea5e9]/90 hover:scale-105 transition-all"
+                  className="h-16 px-10 bg-gradient-to-r from-[#00d9ff] to-[#0ea5e9] text-black font-black text-xl rounded-xl border-4 border-black hover:scale-105 transition-all shadow-[0_0_30px_rgba(0,217,255,0.6)]"
+                  style={{ fontFamily: "'Bebas Neue', 'Impact', sans-serif" }}
                 >
-                  Join Waitlist
+                  JOIN WAITLIST
                 </button>
               </form>
             )}
@@ -133,57 +180,146 @@ export default function Arcade() {
         </div>
       </section>
 
-      {/* Games Teaser */}
-      <section className="py-16 px-6 bg-black/30">
-        <div className="max-w-6xl mx-auto">
-          <h2 className="text-5xl font-[Bangers] text-center text-white mb-12">
-            Coming Soon Games
-          </h2>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {games.map((game, i) => (
-              <motion.div
-                key={game.title}
-                initial={{ opacity: 0, y: 40 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: i * 0.2 }}
-                className="bg-gradient-to-br from-[#1e3a5f] to-[#2d5a7b] rounded-3xl p-8 border-2 border-[#0ea5e9]/30 hover:border-[#ec4899] transition-all group"
-              >
-                <div className="flex items-center justify-center w-20 h-20 mx-auto mb-6 rounded-2xl bg-black/40 text-[#0ea5e9] group-hover:scale-110 transition-transform">
-                  {game.icon}
-                </div>
-                <h3 className="text-3xl font-[Bangers] text-center text-white mb-4">{game.title}</h3>
-                <p className="text-center text-gray-300 mb-6">{game.description}</p>
-                <div className="text-center">
-                  <span className="inline-block bg-black/50 px-6 py-2 rounded-full text-[#0ea5e9] font-bold">
-                    {game.status}
-                  </span>
-                </div>
-              </motion.div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* High Score Teaser */}
-      <section className="py-16 px-6">
-        <div className="max-w-4xl mx-auto text-center">
-          <h2 className="text-5xl font-[Bangers] text-white mb-10">
-            High Score Leaderboard
-          </h2>
-
-          <div className="bg-black/50 backdrop-blur-md border-2 border-[#0ea5e9]/30 rounded-2xl p-10">
-            <p className="text-xl text-gray-300 mb-6">
-              Be the first to top the board when the games launch!
+      {/* Game Selection Screen */}
+      <section className="py-32 px-6 bg-gradient-to-b from-[#0a0e27] to-[#1a1f3a]">
+        <div className="max-w-7xl mx-auto">
+          {/* Title */}
+          <div className="text-center mb-20">
+            <h2
+              className="text-7xl md:text-9xl font-black text-white mb-6"
+              style={{
+                fontFamily: "'Bebas Neue', 'Impact', sans-serif",
+                textShadow: "0 0 40px rgba(251,191,36,0.8)",
+              }}
+            >
+              GAME SELECT
+            </h2>
+            <p className="text-2xl text-[#fbbf24] font-bold">
+              Choose your game. Earn $SHACK rewards.
             </p>
-            <div className="text-6xl font-[Bangers] text-[#0ea5e9] mb-4">
-              00000
-            </div>
-            <p className="text-lg text-gray-400">— Current high score placeholder —</p>
+          </div>
+
+          {/* Games Grid */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {games.map((game, i) => {
+              const Icon = game.icon;
+              return (
+                <motion.div
+                  key={i}
+                  initial={{ opacity: 0, scale: 0.9 }}
+                  whileInView={{ opacity: 1, scale: 1 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: i * 0.1 }}
+                  whileHover={{ scale: 1.05 }}
+                  className={`relative bg-gradient-to-br ${game.color} rounded-3xl p-8 border-4 border-black cursor-pointer group overflow-hidden`}
+                  style={{
+                    boxShadow: `0 0 30px rgba(0, 217, 255, 0.3)`,
+                  }}
+                >
+                  {/* Animated Background Pattern */}
+                  <div className="absolute inset-0 opacity-10">
+                    <motion.div
+                      animate={{ y: [0, -100] }}
+                      transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
+                      className="absolute inset-0"
+                      style={{
+                        backgroundImage: `repeating-linear-gradient(0deg, rgba(255,255,255,0.1) 0px, transparent 2px, transparent 4px)`,
+                      }}
+                    />
+                  </div>
+
+                  {/* Coming Soon Badge */}
+                  <div className="absolute top-4 right-4 bg-black/80 backdrop-blur-sm px-4 py-2 rounded-lg border-2 border-white/30">
+                    <span className="text-white font-bold text-sm uppercase tracking-wider">Coming Soon</span>
+                  </div>
+
+                  {/* Icon */}
+                  <div className="relative w-20 h-20 mx-auto mb-6 rounded-2xl bg-white/20 backdrop-blur-sm border-4 border-white/40 flex items-center justify-center group-hover:scale-110 transition-transform">
+                    {Icon}
+                  </div>
+
+                  {/* Title */}
+                  <h3
+                    className="text-4xl font-black text-white text-center mb-4"
+                    style={{
+                      fontFamily: "'Bebas Neue', 'Impact', sans-serif",
+                      textShadow: "0 4px 8px rgba(0,0,0,0.5)",
+                    }}
+                  >
+                    {game.title}
+                  </h3>
+
+                  {/* Description */}
+                  <p className="text-center text-white/90 font-semibold text-lg leading-relaxed">
+                    {game.description}
+                  </p>
+                </motion.div>
+              );
+            })}
           </div>
         </div>
       </section>
+
+      {/* High Score Leaderboard */}
+      <section className="py-32 px-6 bg-gradient-to-b from-[#1a1f3a] to-[#0a0e27]">
+        <div className="max-w-4xl mx-auto">
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="text-center"
+          >
+            <h2
+              className="text-7xl md:text-9xl font-black text-transparent bg-clip-text bg-gradient-to-r from-[#ec4899] to-[#f97316] mb-12"
+              style={{
+                fontFamily: "'Bebas Neue', 'Impact', sans-serif",
+                textShadow: "0 0 40px rgba(236,72,153,0.8)",
+              }}
+            >
+              HIGH SCORES
+            </h2>
+
+            <div className="bg-black/60 backdrop-blur-md border-4 border-[#00d9ff] rounded-3xl p-12 shadow-[0_0_60px_rgba(0,217,255,0.4)]">
+              <p className="text-2xl text-gray-300 mb-8 font-bold">
+                Be the first to top the leaderboard when games launch!
+              </p>
+
+              {/* Retro Score Display */}
+              <div className="relative">
+                <div
+                  className="text-[120px] font-black text-[#00d9ff] mb-6 tracking-wider"
+                  style={{
+                    fontFamily: "'Bebas Neue', 'Impact', sans-serif",
+                    textShadow: "0 0 40px rgba(0,217,255,1), 0 0 80px rgba(0,217,255,0.6)",
+                  }}
+                >
+                  000000
+                </div>
+                <p className="text-xl text-gray-400 uppercase tracking-widest">
+                  — Awaiting First Player —
+                </p>
+              </div>
+
+              {/* Placeholder Leaderboard */}
+              <div className="mt-12 space-y-4">
+                {[1, 2, 3].map((rank) => (
+                  <div
+                    key={rank}
+                    className="flex items-center justify-between bg-white/5 border-2 border-white/10 rounded-xl p-4"
+                  >
+                    <span className="text-2xl font-black text-[#fbbf24]">#{rank}</span>
+                    <span className="text-xl text-gray-500">- - - - - -</span>
+                    <span className="text-2xl font-black text-[#00d9ff]">000000</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </motion.div>
+        </div>
+      </section>
+
+      {/* Pixelated Border Bottom */}
+      <div className="h-1 bg-gradient-to-r from-transparent via-[#ec4899] to-transparent" />
 
       <Footer />
     </div>
