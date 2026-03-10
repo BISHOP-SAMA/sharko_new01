@@ -1,3 +1,6 @@
+/* 1. Import the actual font files from Google */
+@import url('https://fonts.googleapis.com/css2?family=Bangers&family=Bebas+Neue&family=Inter:wght@300;400;700&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -10,14 +13,29 @@
   }
 
   body {
-    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    /* Now Inter will actually load! */
+    font-family: 'Inter', sans-serif;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     background-color: #0a0e27;
+    color: white;
   }
 
   h1, h2, h3, h4, h5, h6 {
-    font-family: 'Bebas Neue', 'Impact', sans-serif;
+    /* Now Bebas Neue will actually load! */
+    font-family: 'Bebas Neue', sans-serif;
     letter-spacing: 0.05em;
   }
+  
+  /* Adding Bangers for your Logo and Menu links */
+  .font-bangers {
+    font-family: 'Bangers', cursive;
+  }
+}
+
+@layer utilities {
+  .text-stroke {
+    -webkit-text-stroke: 2px black;
+  }
+  /* Your other utilities here... */
 }
