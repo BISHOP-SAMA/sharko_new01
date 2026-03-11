@@ -10,9 +10,9 @@ import { useState } from "react";
 import { Wallet, Lock, Unlock, Trophy, TrendingUp, Clock, Zap } from "lucide-react";
 
 // Contract addresses (UPDATE AFTER DEPLOYMENT)
-const SHACKO_NFT = '0x12940C944f56273EA27BA3271A4E7B04db426ca7';
-const STAKING_CONTRACT = '0xYourStakingContractAddress';
-const XSHACK_TOKEN = '0xYourXShackTokenAddress';
+const SHACKO_NFT = '0x88670d32A2646973895AA1C111d24ee18A585007';
+const STAKING_CONTRACT = '0x4Bf7a99A9D0583B3bc68Ca9480639B59d1E4A787';
+const XSHACK_TOKEN = '0xDF90DefD06AFBdD8a80E546677DFe2df66D418dc';
 
 // ABIs
 const NFT_ABI = parseAbi([
