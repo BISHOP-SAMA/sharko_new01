@@ -111,7 +111,7 @@ export default function Staking() {
       abi: STAKING_ABI,
       functionName: 'stake',
       args: [BigInt(selectedNFT), selectedDuration],
-      value: stakeFee || parseEther('0.5'),
+      value: stakeFee || parseEther('0.0001'),
     });
     
     setShowStakeModal(false);
