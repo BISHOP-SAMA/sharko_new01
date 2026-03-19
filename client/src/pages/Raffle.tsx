@@ -1,67 +1,135 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Header from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { motion } from "framer-motion";
-import { useAccount, useBalance } from "wagmi";
+import { useAccount, useReadContract, useWriteContract, useWaitForTransactionReceipt } from "wagmi";
 import { base } from "wagmi/chains";
-import { formatEther } from "viem";
-import { Ticket, Trophy, Users, Clock, Sparkles, Zap, Gift } from "lucide-react";
+import { Ticket, Trophy, Users, Clock, Sparkles, Zap, Gift, CheckCircle } from "lucide-react";
 
-// Placeholder xSHACK token address - UPDATE AFTER DEPLOYMENT
-const XSHACK_TOKEN_ADDRESS = "0xYourXShackTokenAddress";
+// Contract addresses - UPDATE AFTER DEPLOYMENT
+const SHACK_TOKEN_ADDRESS = "0xYourShackTokenAddress" as `0x${string}`;
+const MULTI_RAFFLE_ADDRESS = "0xYourMultiRaffleAddress" as `0x${string}`;
+
+// ABIs
+import ShackABI from "@/config/abis/ShackoToken.json";
+import MultiRaffleABI from "@/config/abis/ShackoMultiRaffle.json";
+
+interface RaffleData {
+  id: number;
+  nftContract: string;
+  tokenId: bigint;
+  maxEntries: bigint;
+  currentEntries: bigint;
+  entryCost: bigint;
+  isActive: boolean;
+  isComplete: boolean;
+  winner: string;
+}
 
 export default function Raffle() {
   const { address, isConnected } = useAccount();
+  const [activeRaffles, setActiveRaffles] = useState<RaffleData[]>([]);
+  const [completedRaffles, setCompletedRaffles] = useState<RaffleData[]>([]);
 
-  // Get ETH balance on Base
-  const { data: ethBalance } = useBalance({
-    address: address,
-    chainId: base.id,
+  // Read $SHACK balance
+  const { data: shackBalance } = useReadContract({
+    address: SHACK_TOKEN_ADDRESS,
+    abi: ShackABI,
+    functionName: 'balanceOf',
+    args: address ? [address] : undefined,
   });
 
-  // Get xSHACK balance (placeholder for now)
-  const xShackBalance = "0";
+  // Read active raffle IDs
+  const { data: activeRaffleIds, refetch: refetchActive } = useReadContract({
+    address: MULTI_RAFFLE_ADDRESS,
+    abi: MultiRaffleABI,
+    functionName: 'getActiveRaffles',
+  });
 
-  const comingSoonRaffles = [
-    {
-      id: 1,
-      name: "Legendary Shacko Drop",
-      icon: Trophy,
-      prize: "1x Legendary NFT",
-      entryFee: "100 xSHACK",
-      maxEntries: 100,
-      status: "Coming Soon",
-      gradient: "from-[#fbbf24] to-[#f59e0b]",
-    },
-    {
-      id: 2,
-      name: "Epic Shacko Bundle",
-      icon: Sparkles,
-      prize: "3x Epic NFTs",
-      entryFee: "50 xSHACK",
-      maxEntries: 200,
-      status: "Coming Soon",
-      gradient: "from-[#8b5cf6] to-[#7c3aed]",
-    },
-    {
-      id: 3,
-      name: "xSHACK Jackpot",
-      icon: Gift,
-      prize: "10,000 xSHACK",
-      entryFee: "25 xSHACK",
-      maxEntries: 500,
-      status: "Coming Soon",
-      gradient: "from-[#10b981] to-[#14b8a6]",
-    },
-  ];
+  // Read completed raffle IDs
+  const { data: completedRaffleIds } = useReadContract({
+    address: MULTI_RAFFLE_ADDRESS,
+    abi: MultiRaffleABI,
+    functionName: 'getCompletedRaffles',
+  });
+
+  // Write functions
+  const { writeContract, data: hash, isPending } = useWriteContract();
+  const { isLoading: isConfirming, isSuccess } = useWaitForTransactionReceipt({ hash });
+
+  // Fetch raffle details
+  useEffect(() => {
+    if (activeRaffleIds && Array.isArray(activeRaffleIds)) {
+      fetchRaffleDetails(activeRaffleIds, setActiveRaffles);
+    }
+  }, [activeRaffleIds]);
+
+  useEffect(() => {
+    if (completedRaffleIds && Array.isArray(completedRaffleIds)) {
+      fetchRaffleDetails(completedRaffleIds, setCompletedRaffles);
+    }
+  }, [completedRaffleIds]);
+
+  // Refetch after transaction success
+  useEffect(() => {
+    if (isSuccess) {
+      setTimeout(() => refetchActive(), 2000);
+    }
+  }, [isSuccess]);
+
+  const fetchRaffleDetails = async (ids: bigint[], setter: Function) => {
+    // In a real implementation, you'd call getRaffleInfo for each ID
+    // For now, this is a placeholder
+    const raffles: RaffleData[] = ids.map((id) => ({
+      id: Number(id),
+      nftContract: "0x7f30f4b6d5C98D29E32cf013558A01443c87C013",
+      tokenId: BigInt(500 + Number(id)),
+      maxEntries: BigInt(100),
+      currentEntries: BigInt(0),
+      entryCost: BigInt("100000000000000000000"),
+      isActive: true,
+      isComplete: false,
+      winner: "0x0000000000000000000000000000000000000000",
+    }));
+    setter(raffles);
+  };
+
+  const handleEnterRaffle = async (raffleId: number) => {
+    if (!isConnected) {
+      alert('Please connect your wallet');
+      return;
+    }
+
+    try {
+      writeContract({
+        address: MULTI_RAFFLE_ADDRESS,
+        abi: MultiRaffleABI,
+        functionName: 'enterRaffle',
+        args: [BigInt(raffleId)],
+      });
+    } catch (error) {
+      console.error('Entry failed:', error);
+      alert('Failed to enter raffle. Check console for details.');
+    }
+  };
+
+  const formatShack = (balance: bigint | undefined) => {
+    if (!balance) return '0';
+    return Math.floor(Number(balance) / 1e18).toLocaleString();
+  };
+
+  const getProgressPercentage = (current: bigint, max: bigint) => {
+    if (max === BigInt(0)) return 0;
+    return Number((current * BigInt(100)) / max);
+  };
 
   const steps = [
     {
       icon: Ticket,
-      title: "Earn xSHACK",
-      description: "Stake your SHACKO NFTs to earn xSHACK tokens",
+      title: "Earn $SHACK",
+      description: "Stake your SHACKO NFTs to earn $SHACK tokens",
       color: "from-[#0ea5e9] to-[#38bdf8]",
     },
     {
@@ -72,14 +140,14 @@ export default function Raffle() {
     },
     {
       icon: Users,
-      title: "Enter with xSHACK",
-      description: "Use xSHACK to enter the raffle",
+      title: "Enter with $SHACK",
+      description: "Burn 100 $SHACK to enter (1 entry per raffle)",
       color: "from-[#fbbf24] to-[#f59e0b]",
     },
     {
-      icon: Clock,
-      title: "Wait for Draw",
-      description: "Winner drawn randomly when raffle ends",
+      icon: Zap,
+      title: "Auto Draw",
+      description: "Winner picked automatically when raffle fills up!",
       color: "from-[#10b981] to-[#14b8a6]",
     },
   ];
@@ -106,19 +174,18 @@ export default function Raffle() {
               SHACKO RAFFLES
             </h1>
             <p className="text-2xl md:text-3xl text-gray-300 font-bold max-w-3xl mx-auto">
-              Use xSHACK to enter raffles and win exclusive prizes
+              Enter raffles with $SHACK and win exclusive NFTs!
             </p>
           </motion.div>
 
-          {/* Wallet Balances */}
+          {/* $SHACK Balance */}
           {isConnected ? (
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-16"
+              className="mb-16"
             >
-              {/* xSHACK Balance */}
-              <div className="bg-gradient-to-br from-[#fbbf24] to-[#f59e0b] border-4 border-black rounded-3xl p-8 shadow-2xl">
+              <div className="bg-gradient-to-br from-[#fbbf24] to-[#f59e0b] border-4 border-black rounded-3xl p-8 shadow-2xl max-w-2xl mx-auto">
                 <div className="flex items-center gap-4 mb-4">
                   <div className="w-16 h-16 rounded-full bg-white/20 backdrop-blur-sm border-2 border-white/40 flex items-center justify-center">
                     <Zap size={32} className="text-white" />
@@ -127,30 +194,11 @@ export default function Raffle() {
                     className="text-3xl font-black text-white"
                     style={{ fontFamily: "'Bebas Neue', 'Impact', sans-serif" }}
                   >
-                    xSHACK Balance
+                    Your $SHACK Balance
                   </h3>
                 </div>
-                <p className="text-6xl font-black text-white mb-2">{xShackBalance}</p>
-                <p className="text-lg text-white/90 font-semibold">Stake NFTs to earn more xSHACK</p>
-              </div>
-
-              {/* Base ETH Balance */}
-              <div className="bg-gradient-to-br from-[#0ea5e9] to-[#38bdf8] border-4 border-black rounded-3xl p-8 shadow-2xl">
-                <div className="flex items-center gap-4 mb-4">
-                  <div className="w-16 h-16 rounded-full bg-white/20 backdrop-blur-sm border-2 border-white/40 flex items-center justify-center">
-                    <Sparkles size={32} className="text-white" />
-                  </div>
-                  <h3
-                    className="text-3xl font-black text-white"
-                    style={{ fontFamily: "'Bebas Neue', 'Impact', sans-serif" }}
-                  >
-                    Base ETH
-                  </h3>
-                </div>
-                <p className="text-6xl font-black text-white mb-2">
-                  {ethBalance ? parseFloat(formatEther(ethBalance.value)).toFixed(4) : "0.0000"}
-                </p>
-                <p className="text-lg text-white/90 font-semibold">Used for transaction fees</p>
+                <p className="text-6xl font-black text-white mb-2">{formatShack(shackBalance as bigint)}</p>
+                <p className="text-lg text-white/90 font-semibold">Each entry costs 100 $SHACK</p>
               </div>
             </motion.div>
           ) : (
@@ -160,10 +208,10 @@ export default function Raffle() {
               className="bg-gradient-to-br from-[#1a3a52] to-[#0f1729] border-2 border-[#00d9ff]/30 rounded-3xl p-10 text-center mb-16"
             >
               <p className="text-2xl md:text-3xl font-bold text-white mb-4">
-                Connect your wallet to view balances and enter raffles
+                Connect your wallet to view raffles and enter
               </p>
               <p className="text-lg text-gray-400">
-                You'll need xSHACK tokens to participate in raffles
+                You'll need $SHACK tokens to participate in raffles
               </p>
             </motion.div>
           )}
@@ -174,7 +222,7 @@ export default function Raffle() {
               className="text-6xl md:text-8xl font-black text-white mb-12 text-center"
               style={{ fontFamily: "'Bebas Neue', 'Impact', sans-serif" }}
             >
-              How to Participate
+              How It Works
             </h2>
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -206,100 +254,180 @@ export default function Raffle() {
             </div>
           </div>
 
-          {/* Coming Soon Raffles */}
-          <div className="mb-16">
-            <h2
-              className="text-6xl md:text-8xl font-black text-white text-center mb-12"
-              style={{ fontFamily: "'Bebas Neue', 'Impact', sans-serif" }}
-            >
-              Upcoming Raffles
-            </h2>
+          {/* Active Raffles */}
+          {activeRaffles.length > 0 ? (
+            <div className="mb-16">
+              <h2
+                className="text-6xl md:text-8xl font-black text-white text-center mb-12"
+                style={{ fontFamily: "'Bebas Neue', 'Impact', sans-serif" }}
+              >
+                Active Raffles
+              </h2>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-              {comingSoonRaffles.map((raffle, index) => {
-                const Icon = raffle.icon;
-                return (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                {activeRaffles.map((raffle) => {
+                  const progress = getProgressPercentage(raffle.currentEntries, raffle.maxEntries);
+                  
+                  return (
+                    <motion.div
+                      key={raffle.id}
+                      initial={{ opacity: 0, y: 20 }}
+                      whileInView={{ opacity: 1, y: 0 }}
+                      viewport={{ once: true }}
+                      className="bg-gradient-to-br from-[#8b5cf6] to-[#7c3aed] border-4 border-black rounded-3xl overflow-hidden shadow-2xl"
+                    >
+                      {/* NFT Image Placeholder */}
+                      <div className="h-64 bg-gradient-to-br from-white/10 to-white/5 backdrop-blur-sm border-b-4 border-black flex items-center justify-center">
+                        <div className="text-center">
+                          <Trophy size={64} className="text-white mx-auto mb-4" />
+                          <p className="text-white font-black text-2xl">
+                            SHACKO #{raffle.tokenId.toString()}
+                          </p>
+                        </div>
+                      </div>
+
+                      {/* Raffle Details */}
+                      <div className="p-6">
+                        <h3
+                          className="text-3xl font-black text-white mb-4"
+                          style={{ fontFamily: "'Bebas Neue', 'Impact', sans-serif" }}
+                        >
+                          Raffle #{raffle.id}
+                        </h3>
+
+                        {/* Progress Bar */}
+                        <div className="mb-6">
+                          <div className="flex justify-between text-white font-bold mb-2">
+                            <span>Entries</span>
+                            <span>{raffle.currentEntries.toString()}/{raffle.maxEntries.toString()}</span>
+                          </div>
+                          <div className="w-full bg-black/30 rounded-full h-6 border-2 border-white/20 overflow-hidden">
+                            <div
+                              className="bg-gradient-to-r from-[#fbbf24] to-[#f59e0b] h-full rounded-full transition-all duration-500"
+                              style={{ width: `${progress}%` }}
+                            />
+                          </div>
+                          <p className="text-white/80 text-sm mt-1 font-semibold text-right">{progress}% Full</p>
+                        </div>
+
+                        <div className="space-y-3 mb-6">
+                          <div className="flex justify-between items-center bg-white/10 backdrop-blur-sm rounded-xl p-3 border-2 border-white/20">
+                            <span className="text-white/80 font-bold">Entry Cost</span>
+                            <span className="text-white font-black">100 $SHACK</span>
+                          </div>
+                          
+                          <div className="flex justify-between items-center bg-white/10 backdrop-blur-sm rounded-xl p-3 border-2 border-white/20">
+                            <span className="text-white/80 font-bold">Your Status</span>
+                            <span className="text-white font-black">Not Entered</span>
+                          </div>
+                        </div>
+
+                        {/* Enter Button */}
+                        <button
+                          onClick={() => handleEnterRaffle(raffle.id)}
+                          disabled={isPending || isConfirming}
+                          className="w-full bg-gradient-to-r from-[#fbbf24] to-[#f59e0b] text-black font-black py-4 rounded-xl border-4 border-black hover:opacity-90 transition-opacity disabled:opacity-50 text-xl"
+                          style={{ fontFamily: "'Bebas Neue', 'Impact', sans-serif" }}
+                        >
+                          {isPending || isConfirming ? 'ENTERING...' : 'ENTER RAFFLE (100 $SHACK)'}
+                        </button>
+                      </div>
+                    </motion.div>
+                  );
+                })}
+              </div>
+            </div>
+          ) : (
+            <div className="mb-16">
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                className="bg-gradient-to-br from-[#ec4899] to-[#f97316] border-4 border-black rounded-3xl p-10 text-center shadow-2xl"
+              >
+                <Gift size={80} className="text-white mx-auto mb-6" />
+                <h3
+                  className="text-5xl md:text-7xl font-black text-white mb-6"
+                  style={{ fontFamily: "'Bebas Neue', 'Impact', sans-serif" }}
+                >
+                  No Active Raffles
+                </h3>
+                <p className="text-xl md:text-2xl text-white font-bold mb-4 max-w-3xl mx-auto">
+                  New raffles coming soon! Start staking to earn $SHACK.
+                </p>
+              </motion.div>
+            </div>
+          )}
+
+          {/* Completed Raffles */}
+          {completedRaffles.length > 0 && (
+            <div className="mb-16">
+              <h2
+                className="text-6xl md:text-8xl font-black text-white text-center mb-12"
+                style={{ fontFamily: "'Bebas Neue', 'Impact', sans-serif" }}
+              >
+                Past Winners
+              </h2>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                {completedRaffles.map((raffle) => (
                   <motion.div
                     key={raffle.id}
                     initial={{ opacity: 0, y: 20 }}
                     whileInView={{ opacity: 1, y: 0 }}
                     viewport={{ once: true }}
-                    transition={{ delay: index * 0.1 }}
-                    className={`bg-gradient-to-br ${raffle.gradient} border-4 border-black rounded-3xl overflow-hidden shadow-2xl relative`}
+                    className="bg-gradient-to-br from-[#10b981] to-[#14b8a6] border-4 border-black rounded-3xl overflow-hidden shadow-2xl relative"
                   >
-                    {/* Coming Soon Badge */}
                     <div className="absolute top-4 right-4 bg-black/80 backdrop-blur-sm text-white px-5 py-2 rounded-full font-black text-sm uppercase tracking-wider border-2 border-white/30 z-10">
-                      {raffle.status}
+                      ✓ Complete
                     </div>
 
-                    {/* Icon Display */}
-                    <div className="h-64 flex items-center justify-center bg-white/10 backdrop-blur-sm border-b-4 border-black">
-                      <div className="w-32 h-32 rounded-full bg-white/20 backdrop-blur-sm border-4 border-white/40 flex items-center justify-center">
-                        <Icon size={64} className="text-white" />
-                      </div>
+                    <div className="h-48 bg-gradient-to-br from-white/10 to-white/5 backdrop-blur-sm border-b-4 border-black flex items-center justify-center">
+                      <CheckCircle size={64} className="text-white" />
                     </div>
 
-                    {/* Raffle Details */}
-                    <div className="p-8">
+                    <div className="p-6">
                       <h3
-                        className="text-4xl font-black text-white mb-6"
+                        className="text-3xl font-black text-white mb-4"
                         style={{ fontFamily: "'Bebas Neue', 'Impact', sans-serif" }}
                       >
-                        {raffle.name}
+                        SHACKO #{raffle.tokenId.toString()}
                       </h3>
-                      
-                      <div className="space-y-4 mb-6">
-                        <div className="flex justify-between items-center bg-white/10 backdrop-blur-sm rounded-xl p-4 border-2 border-white/20">
-                          <span className="text-white/80 font-bold">Prize</span>
-                          <span className="text-white font-black">{raffle.prize}</span>
-                        </div>
-                        
-                        <div className="flex justify-between items-center bg-white/10 backdrop-blur-sm rounded-xl p-4 border-2 border-white/20">
-                          <span className="text-white/80 font-bold">Entry Fee</span>
-                          <span className="text-white font-black">{raffle.entryFee}</span>
-                        </div>
-                        
-                        <div className="flex justify-between items-center bg-white/10 backdrop-blur-sm rounded-xl p-4 border-2 border-white/20">
-                          <span className="text-white/80 font-bold">Max Entries</span>
-                          <span className="text-white font-black">{raffle.maxEntries}</span>
-                        </div>
+
+                      <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4 border-2 border-white/20 mb-4">
+                        <p className="text-white/80 font-bold text-sm mb-1">Winner</p>
+                        <p className="text-white font-black text-lg break-all">
+                          {raffle.winner.slice(0, 6)}...{raffle.winner.slice(-4)}
+                        </p>
                       </div>
 
-                      {/* Coming Soon Button */}
-                      <button
-                        disabled
-                        className="w-full bg-black/60 backdrop-blur-sm text-white/60 font-black py-5 rounded-xl border-4 border-white/20 cursor-not-allowed text-xl"
-                        style={{ fontFamily: "'Bebas Neue', 'Impact', sans-serif" }}
-                      >
-                        COMING SOON
-                      </button>
+                      <div className="flex justify-between text-white font-bold">
+                        <span>Total Entries:</span>
+                        <span>{raffle.maxEntries.toString()}</span>
+                      </div>
                     </div>
                   </motion.div>
-                );
-              })}
+                ))}
+              </div>
             </div>
-          </div>
+          )}
 
-          {/* Info Banner */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            className="bg-gradient-to-br from-[#ec4899] to-[#f97316] border-4 border-black rounded-3xl p-10 text-center shadow-2xl"
-          >
-            <h3
-              className="text-5xl md:text-7xl font-black text-white mb-6"
-              style={{ fontFamily: "'Bebas Neue', 'Impact', sans-serif" }}
-            >
-              Raffle System Launching Soon
-            </h3>
-            <p className="text-xl md:text-2xl text-white font-bold mb-4 max-w-3xl mx-auto">
-              Our custom raffle system is being built with provably fair draws using Chainlink VRF
-            </p>
-            <p className="text-lg text-white/90 font-semibold max-w-2xl mx-auto">
-              Start staking your NFTs now to accumulate xSHACK for upcoming raffles
-            </p>
-          </motion.div>
+          {/* Transaction Status */}
+          {isConfirming && (
+            <div className="fixed bottom-8 right-8 bg-gradient-to-r from-[#fbbf24] to-[#f59e0b] border-4 border-black rounded-2xl p-6 shadow-2xl z-50">
+              <p className="text-black font-black text-lg">
+                ⏳ Confirming transaction...
+              </p>
+            </div>
+          )}
+
+          {isSuccess && (
+            <div className="fixed bottom-8 right-8 bg-gradient-to-r from-[#10b981] to-[#14b8a6] border-4 border-black rounded-2xl p-6 shadow-2xl z-50">
+              <p className="text-white font-black text-lg">
+                ✅ Entry successful!
+              </p>
+            </div>
+          )}
         </div>
       </main>
 
