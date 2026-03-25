@@ -11,7 +11,7 @@ import { Wallet, Lock, Trophy, TrendingUp, Clock, Zap, X, AlertTriangle, Chevron
 
 const SHACKO_NFT = '0x7f30f4b6d5C98D29E32cf013558A01443c87C013';
 const STAKING_CONTRACT = '0xCb5EA03fdEF2FfC793d2fF4811477f3c20d4Fda5';
-const XSHACK_TOKEN = '0x2FbCa943BbD81FCCeaedFAdbb324Bba51Fc6A2E3';
+const SHACK_TOKEN = '0x2FbCa943BbD81FCCeaedFAdbb324Bba51Fc6A2E3';
 
 const NFT_ABI = parseAbi([
   'function balanceOf(address owner) view returns (uint256)',
@@ -31,7 +31,7 @@ const STAKING_ABI = parseAbi([
   'function emergencyUnstakeFee() view returns (uint256)',
 ]);
 
-const XSHACK_ABI = parseAbi([
+const SHACK_ABI = parseAbi([
   'function balanceOf(address account) view returns (uint256)',
 ]);
 
@@ -89,7 +89,7 @@ export default function Staking() {
   });
 
   const { data: xShackBalance } = useReadContract({
-    address: XSHACK_TOKEN, abi: XSHACK_ABI, functionName: 'balanceOf',
+    address: SHACK_TOKEN, abi: SHACK_ABI, functionName: 'balanceOf',
     args: address ? [address] : undefined,
   });
 
@@ -184,7 +184,7 @@ export default function Staking() {
               </div>
               <h1 className="text-3xl font-bold text-white mb-2">Stake Your SHACKOs</h1>
               <p className="text-gray-400 mb-8 max-w-sm text-sm">
-                Connect your wallet to view your NFTs and start earning xSHACK rewards
+                Connect your wallet to view your NFTs and start earning SHACK rewards
               </p>
               <ConnectButton.Custom>
                 {({ openConnectModal }) => (
@@ -205,13 +205,13 @@ export default function Staking() {
               {/* Page Title */}
               <div className="mb-8">
                 <h1 className="text-2xl font-bold text-white">Staking Dashboard</h1>
-                <p className="text-gray-500 text-sm mt-1">Stake your SHACKO NFTs to earn xSHACK rewards</p>
+                <p className="text-gray-500 text-sm mt-1">Stake your SHACKO NFTs to earn SHACK rewards</p>
               </div>
 
               {/* Stats */}
               <div className="grid grid-cols-3 gap-4 mb-8">
                 {[
-                  { label: 'xSHACK Balance', value: xShackBalance ? Math.floor(Number(formatEther(xShackBalance))).toLocaleString() : '0', icon: Trophy, color: 'text-[#fbbf24]', accent: 'bg-[#fbbf24]/10' },
+                  { label: 'xSHACK Balance', value: ShackBalance ? Math.floor(Number(formatEther(ShackBalance))).toLocaleString() : '0', icon: Trophy, color: 'text-[#fbbf24]', accent: 'bg-[#fbbf24]/10' },
                   { label: 'Total NFTs',     value: nftBalance ? Number(nftBalance).toString() : '0', icon: Wallet, color: 'text-blue-400', accent: 'bg-blue-500/10' },
                   { label: 'Staked NFTs',   value: stakedNFTs ? stakedNFTs.length.toString() : '0', icon: Lock,   color: 'text-emerald-400', accent: 'bg-emerald-500/10' },
                 ].map(({ label, value, icon: Icon, color, accent }) => (
@@ -240,14 +240,14 @@ export default function Staking() {
                   </div>
                   <h2 className="text-white font-bold text-lg mb-1">Stake NFTs &amp; Earn on Base</h2>
                   <p className="text-gray-400 text-sm mb-4">
-                    Earn xSHACK rewards by staking your SHACKO NFTs. All rewards are distributed on Base.
+                    Earn SHACK rewards by staking your SHACKO NFTs. All rewards are distributed on Base.
                   </p>
                   <div className="flex items-center gap-4">
                     <div>
                       <p className="text-xs text-gray-500 mb-0.5">Total Earned</p>
                       <p className="text-xl font-bold text-white">
-                        {xShackBalance ? Math.floor(Number(formatEther(xShackBalance))).toLocaleString() : '0'}
-                        <span className="text-sm text-[#fbbf24] ml-1">xSHACK</span>
+                        {ShackBalance ? Math.floor(Number(formatEther(ShackBalance))).toLocaleString() : '0'}
+                        <span className="text-sm text-[#fbbf24] ml-1">SHACK</span>
                       </p>
                     </div>
                     <div>
@@ -520,7 +520,7 @@ function StakedNFTCard({
         <div className="bg-white/5 rounded-xl p-2.5 text-center">
           <p className="text-xs text-gray-600 mb-1">Per Day</p>
           <p className="text-sm font-semibold text-white">{earningsPerDay.toLocaleString()}</p>
-          <p className="text-xs text-gray-600">xSHACK</p>
+          <p className="text-xs text-gray-600">SHACK</p>
         </div>
         <div className="bg-white/5 rounded-xl p-2.5 text-center">
           <p className="text-xs text-gray-600 mb-1">Time Left</p>
