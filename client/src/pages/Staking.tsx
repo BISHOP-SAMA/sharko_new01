@@ -734,3 +734,4 @@ function StakedNFTCard({
     </motion.div>
   );
 }
+
