@@ -14,33 +14,39 @@ const SHACKO_NFT      = '0x7f30f4b6d5C98D29E32cf013558A01443c87C013';
 const STAKING_CONTRACT = '0xCb5EA03fdEF2FfC793d2fF4811477f3c20d4Fda5';
 const SHACK_TOKEN     = '0x2FbCa943BbD81FCCeaedFAdbb324Bba51Fc6A2E3';
 
-// ── ABIs ──────────────────────────────────────────────────────────────────────
+// ── UPDATED ABIs ──────────────────────────────────────────────────────────────
 const NFT_ABI = parseAbi([
   'function balanceOf(address owner) view returns (uint256)',
-  'function tokenOfOwnerByIndex(address owner, uint256 index) view returns (uint256)',
+  'function ownerOf(uint256 tokenId) view returns (address)',
   'function isApprovedForAll(address owner, address operator) view returns (bool)',
   'function setApprovalForAll(address operator, bool approved)',
-  'function tokenRarity(uint256 tokenId) view returns (string)',
 ]);
 
 const STAKING_ABI = parseAbi([
   'function stake(uint256 tokenId, uint8 duration) payable',
-  'function stakeAll(uint256[] tokenIds, uint8 duration) payable',
   'function unstake(uint256 tokenId)',
-  'function emergencyUnstake(uint256 tokenId) payable',
-  'function claimRewards(uint256 tokenId)',
-  'function claimAllRewards()',
-  'function getUserStakes(address user) view returns (uint256[])',
   'function getStakeInfo(uint256 tokenId) view returns (address owner, uint256 stakedAt, uint256 unlockTime, uint256 pendingRewards, bool isStaked, string rarity)',
-  'function calculateRewards(uint256 tokenId) view returns (uint256)',
+  'function getUserStakes(address user) view returns (uint256[])',
+  'function tokenRarity(uint256 tokenId) view returns (string)', // Calling rarity here instead!
   'function stakeFee() view returns (uint256)',
-  'function emergencyUnstakeFee() view returns (uint256)',
-  'function tokenRarity(uint256 tokenId) view returns (string)',
 ]);
 
-const SHACK_ABI = parseAbi([
-  'function balanceOf(address account) view returns (uint256)',
-]);
+// ── IMAGE GATEWAY ─────────────────────────────────────────────────────────────
+const IPFS_GATEWAY = "https://gateway.lighthouse.storage/ipfs/bafybeihieoxvg36vedmbpmy2fx7nbdv6ka7vdyn5qcusmcw2ooz7bzmdqa";
+
+// ... inside your NFT Card components ...
+
+{/* Replace the old placeholder div with this */}
+<div className="w-full aspect-square rounded-xl border border-white/5 overflow-hidden mb-4 bg-[#0d1525]">
+  <img 
+    src={`${IPFS_GATEWAY}/${tokenId}.png`} 
+    alt={`Shacko #${tokenId}`}
+    className="w-full h-full object-cover"
+    onError={(e) => {
+      e.currentTarget.src = "https://placehold.co/400x400/0d1525/fbbf24?text=Shacko+NFT";
+    }}
+  />
+</div>
 
 // ── CONSTANTS ─────────────────────────────────────────────────────────────────
 const rarityColors: Record<string, { bg: string; text: string; border: string }> = {
