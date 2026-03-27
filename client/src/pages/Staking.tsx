@@ -1,32 +1,34 @@
 "use client";
 
+import { useState, useEffect, useMemo, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { Alchemy, Network, Nft } from "alchemy-sdk";
+import { 
+  useAccount, useReadContract, useWriteContract, 
+  useWaitForTransactionReceipt, useBalance 
+} from "wagmi";
+import { parseAbi, formatEther, parseEther, getAddress } from "viem";
+import { 
+  Wallet, Zap, TrendingUp, Trophy, Clock, X, 
+  AlertTriangle, ChevronRight, Layers, Loader2, ExternalLink 
+} from "lucide-react";
+
 import Header from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { ConnectButton } from '@rainbow-me/rainbowkit';
-import { useAccount, useReadContract, useWriteContract, useWaitForTransactionReceipt } from 'wagmi';
-import { parseAbi, formatEther, parseEther } from 'viem';
-import { useState, useEffect, useMemo } from "react";
-import { Alchemy, Network } from "alchemy-sdk";
-import { Wallet, Zap, TrendingUp, Trophy, Clock, X, AlertTriangle, ChevronRight, Layers } from "lucide-react";
 
-// ── MAINNET CONTRACTS ───────────────────────────────────────────────────────
-const SHACKO_NFT = '0x7f30f4b6d5C98D29E32cf013558A01443c87C013' as const;
-const STAKING_CONTRACT = '0xCb5EA03fdEF2FfC793d2fF4811477f3c20d4Fda5' as const;
-const SHACK_TOKEN = '0x2FbCa943BbD81FCCeaedFAdbb324Bba51Fc6A2E3' as const;
+// ── CONFIGURATION ──────────────────────────────────────────────────────────
+const SHACKO_NFT = getAddress('0x7f30f4b6d5C98D29E32cf013558A01443c87C013');
+const STAKING_CONTRACT = getAddress('0xCb5EA03fdEF2FfC793d2fF4811477f3c20d4Fda5');
+const SHACK_TOKEN = getAddress('0x2FbCa943BbD81FCCeaedFAdbb324Bba51Fc6A2E3');
 
-// ── ALCHEMY SETUP ───────────────────────────────────────────────────────────
 const alchemy = new Alchemy({
-  apiKey: process.env.NEXT_PUBLIC_ALCHEMY_API_KEY!,
+  apiKey: process.env.NEXT_PUBLIC_ALCHEMY_API_KEY,
   network: Network.BASE_MAINNET,
 });
 
-// ── IPFS ──────────────────────────────────────────────────────────────────────
-const IPFS_METADATA_BASE = 'https://gateway.lighthouse.storage/ipfs/bafybeifbjqcpmzdp7cu7elgegetznctxiwdibjdsjmlz7ck2lkfy3gzaey';
-
-// ── ABIs ──────────────────────────────────────────────────────────────────────
+// ── ABIs ────────────────────────────────────────────────────────────────────
 const NFT_ABI = parseAbi([
-  'function balanceOf(address owner) view returns (uint256)',
   'function isApprovedForAll(address owner, address operator) view returns (bool)',
   'function setApprovalForAll(address operator, bool approved)',
 ]);
@@ -35,178 +37,254 @@ const STAKING_ABI = parseAbi([
   'function stake(uint256 tokenId, uint8 duration) payable',
   'function stakeAll(uint256[] tokenIds, uint8 duration) payable',
   'function unstake(uint256 tokenId)',
-  'function emergencyUnstake(uint256 tokenId) payable',
   'function claimRewards(uint256 tokenId)',
   'function claimAllRewards()',
   'function getUserStakes(address user) view returns (uint256[])',
-  'function getStakeInfo(uint256 tokenId) view returns (address, uint256, uint8, uint256, uint256, bool)',
-  'function tokenRarity(uint256 tokenId) view returns (string)',
   'function stakeFee() view returns (uint256)',
 ]);
 
 const SHACK_ABI = parseAbi(['function balanceOf(address account) view returns (uint256)']);
 
-// ── CONSTANTS ─────────────────────────────────────────────────────────────────
-const rarityColors: Record<string, { bg: string; text: string; border: string; glow: string }> = {
-  'Common':    { bg: 'bg-slate-500/20',   text: 'text-slate-300',   border: 'border-slate-500/40',   glow: '' },
-  'Uncommon':  { bg: 'bg-emerald-500/20', text: 'text-emerald-300', border: 'border-emerald-500/40', glow: 'shadow-emerald-500/20' },
-  'Rare':      { bg: 'bg-blue-500/20',    text: 'text-blue-300',    border: 'border-blue-500/40',    glow: 'shadow-blue-500/20' },
-  'Epic':      { bg: 'bg-purple-500/20',  text: 'text-purple-300',  border: 'border-purple-500/40',  glow: 'shadow-purple-500/20' },
-  'Legendary': { bg: 'bg-amber-500/20',   text: 'text-amber-300',   border: 'border-amber-500/40',   glow: 'shadow-amber-500/30' },
-  'OneOfOne':  { bg: 'bg-rose-500/20',    text: 'text-rose-300',    border: 'border-rose-500/40',    glow: 'shadow-rose-500/30' },
-};
-
-const baseRateMap: Record<string, number> = {
-  'Common': 10, 'Uncommon': 15, 'Rare': 20,
-  'Epic': 40,   'Legendary': 70, 'OneOfOne': 100,
-};
-
-const rarityMultMap: Record<string, number> = {
-  'Common': 100, 'Uncommon': 125, 'Rare': 150,
-  'Epic': 200,   'Legendary': 300, 'OneOfOne': 500,
-};
-
 const DURATIONS = [
-  { label: '7 Days',  multiplier: '1.0x',  icon: Zap,        mult: 100, value: 0 },
-  { label: '14 Days', multiplier: '1.25x', icon: TrendingUp, mult: 125, value: 1 },
-  { label: '30 Days', multiplier: '1.5x',  icon: Trophy,     mult: 150, value: 2 },
-  { label: '60 Days', multiplier: '2.0x',  icon: Clock,      mult: 200, value: 3 },
+  { label: '7 Days',  multiplier: '1.0x',  icon: Zap,        value: 0 },
+  { label: '14 Days', multiplier: '1.25x', icon: TrendingUp, value: 1 },
+  { label: '30 Days', multiplier: '1.5x',  icon: Trophy,     value: 2 },
+  { label: '60 Days', multiplier: '2.0x',  icon: Clock,      value: 3 },
 ];
 
-function formatCountdown(secondsLeft: number): string {
-  if (secondsLeft <= 0) return 'Unlocked';
-  const d = Math.floor(secondsLeft / 86400);
-  const h = Math.floor((secondsLeft % 86400) / 3600);
-  const m = Math.floor((secondsLeft % 3600) / 60);
-  const s = Math.floor(secondsLeft % 60);
-  if (d > 0) return `${d}D ${h}H ${m}M`;
-  if (h > 0) return `${h}H ${m}M ${s}S`;
-  return `${m}M ${s}S`;
+// ── COMPONENTS ──────────────────────────────────────────────────────────────
+
+function NFTCard({ tokenId, nft, onAction, actionLabel, isLoading }: any) {
+  // Alchemy CDN is primary, Lighthouse is backup
+  const imageUrl = nft?.image?.cachedUrl || 
+    `https://gateway.lighthouse.storage/ipfs/bafybeifbjqcpmzdp7cu7elgegetznctxiwdibjdsjmlz7ck2lkfy3gzaey/${tokenId}.png`;
+
+  return (
+    <motion.div 
+      layout
+      initial={{ opacity: 0, scale: 0.9 }}
+      animate={{ opacity: 1, scale: 1 }}
+      exit={{ opacity: 0, scale: 0.9 }}
+      className="bg-white/5 border border-white/10 rounded-2xl overflow-hidden p-3 hover:border-[#fbbf24]/30 transition-colors"
+    >
+      <div className="relative aspect-square rounded-xl overflow-hidden mb-3 bg-black/20">
+        <img src={imageUrl} alt="" className="w-full h-full object-cover" />
+        <div className="absolute top-2 right-2 bg-black/60 backdrop-blur-md px-2 py-1 rounded-lg text-[10px] font-bold text-white uppercase tracking-tight">
+          ID #{tokenId}
+        </div>
+      </div>
+      <button
+        onClick={() => onAction(tokenId)}
+        disabled={isLoading}
+        className="w-full py-2.5 bg-[#fbbf24] hover:bg-[#f59e0b] disabled:opacity-50 text-black font-bold rounded-xl text-sm transition-all flex items-center justify-center gap-2"
+      >
+        {isLoading && <Loader2 size={14} className="animate-spin" />}
+        {actionLabel}
+      </button>
+    </motion.div>
+  );
 }
 
-// DurationModal component (same as before - paste your existing one here if you have it, or use the one from earlier messages)
-
-// ── MAIN STAKING PAGE ───────────────────────────────────────────────────────
-export default function Staking() {
+// ── MAIN PAGE ───────────────────────────────────────────────────────────────
+export default function StakingPage() {
   const { address, isConnected } = useAccount();
+  
+  // States
+  const [ownedNfts, setOwnedNfts] = useState<Nft[]>([]);
+  const [isLoadingAlchemy, setIsLoadingAlchemy] = useState(false);
   const [stakeModalToken, setStakeModalToken] = useState<number | null>(null);
   const [showStakeAllModal, setShowStakeAllModal] = useState(false);
 
-  // wagmi reads
-  const { data: isApproved, refetch: refetchApproval } = useReadContract({
-    address: SHACKO_NFT, abi: NFT_ABI, functionName: 'isApprovedForAll',
-    args: address ? [address, STAKING_CONTRACT] : undefined,
-  });
-
+  // Wagmi Reads
   const { data: stakedNFTs, refetch: refetchStaked } = useReadContract({
-    address: STAKING_CONTRACT, abi: STAKING_ABI, functionName: 'getUserStakes',
-    args: address ? [address] : undefined,
+    address: STAKING_CONTRACT, abi: STAKING_ABI, functionName: 'getUserStakes', args: address ? [address] : undefined,
   });
-
-  const { data: shackBalance, refetch: refetchBalance } = useReadContract({
-    address: SHACK_TOKEN, abi: SHACK_ABI, functionName: 'balanceOf',
-    args: address ? [address] : undefined,
+  const { data: isApproved, refetch: refetchApproval } = useReadContract({
+    address: SHACKO_NFT, abi: NFT_ABI, functionName: 'isApprovedForAll', args: address ? [address, STAKING_CONTRACT] : undefined,
   });
-
+  const { data: shackBalance, refetch: refetchShack } = useReadContract({
+    address: SHACK_TOKEN, abi: SHACK_ABI, functionName: 'balanceOf', args: address ? [address] : undefined,
+  });
   const { data: stakeFee } = useReadContract({
-    address: STAKING_CONTRACT, abi: STAKING_ABI, functionName: 'stakeFee',
+    address: STAKING_CONTRACT, abi: STAKING_ABI, functionName: 'stakeFee'
   });
 
-  // Alchemy: Auto fetch owned NFTs
-  const [ownedTokenIds, setOwnedTokenIds] = useState<number[]>([]);
-  const [isLoadingNFTs, setIsLoadingNFTs] = useState(false);
-
-  useEffect(() => {
-    if (!address) {
-      setOwnedTokenIds([]);
-      return;
-    }
-
-    const fetchNFTs = async () => {
-      setIsLoadingNFTs(true);
-      try {
-        const response = await alchemy.nft.getNftsForOwner(address, {
-          contractAddresses: [SHACKO_NFT],
-        });
-
-        const ids = response.ownedNfts
-          .map((nft: any) => Number(nft.tokenId))
-          .sort((a: number, b: number) => a - b);
-
-        setOwnedTokenIds(ids);
-      } catch (error) {
-        console.error("Alchemy NFT fetch error:", error);
-        setOwnedTokenIds([]);
-      } finally {
-        setIsLoadingNFTs(false);
-      }
-    };
-
-    fetchNFTs();
+  // Alchemy Fetch
+  const fetchNFTs = useCallback(async () => {
+    if (!address) return;
+    setIsLoadingAlchemy(true);
+    try {
+      const res = await alchemy.nft.getNftsForOwner(address, { contractAddresses: [SHACKO_NFT] });
+      setOwnedNfts(res.ownedNfts);
+    } catch (e) { console.error(e); }
+    finally { setIsLoadingAlchemy(false); }
   }, [address]);
 
-  const stakedSet = useMemo(() => new Set((stakedNFTs ?? []).map(Number)), [stakedNFTs]);
-  const unstakedTokenIds = useMemo(() => ownedTokenIds.filter(id => !stakedSet.has(id)), [ownedTokenIds, stakedSet]);
+  useEffect(() => { fetchNFTs(); }, [fetchNFTs]);
 
-  // Write hooks (add your existing writeContract and waitForTransactionReceipt logic here)
+  // Wagmi Writes
+  const { writeContract, data: hash } = useWriteContract();
+  const { isLoading: isTxPending } = useWaitForTransactionReceipt({ 
+    hash, 
+    onSuccess: () => {
+      refetchStaked();
+      refetchApproval();
+      refetchShack();
+      fetchNFTs();
+    }
+  });
 
-  const refetchAll = () => {
-    refetchStaked();
-    refetchBalance();
-    refetchApproval();
+  const handleApprove = () => writeContract({ 
+    address: SHACKO_NFT, abi: NFT_ABI, functionName: 'setApprovalForAll', args: [STAKING_CONTRACT, true] 
+  });
+
+  const handleStake = (tokenId: number, duration: number) => {
+    writeContract({
+      address: STAKING_CONTRACT, abi: STAKING_ABI, functionName: 'stake',
+      args: [BigInt(tokenId), duration],
+      value: stakeFee ?? parseEther('0.0001')
+    });
+    setStakeModalToken(null);
   };
 
-  // ... (handleApprove, handleStake, handleStakeAll, handleUnstake, handleClaim, etc. — use your existing handlers)
+  const handleClaimAll = () => writeContract({ address: STAKING_CONTRACT, abi: STAKING_ABI, functionName: 'claimAllRewards' });
+
+  // Memoized lists
+  const stakedIds = useMemo(() => (stakedNFTs || []).map(Number), [stakedNFTs]);
+  const unstakedNfts = useMemo(() => ownedNfts.filter(n => !stakedIds.includes(Number(n.tokenId))), [ownedNfts, stakedIds]);
 
   return (
-    <div className="min-h-screen bg-[#060b18] overflow-x-hidden">
+    <div className="min-h-screen bg-[#060b18] text-white selection:bg-[#fbbf24]/30">
       <Header />
-      <main className="pt-32 pb-20 px-4 md:px-8">
-        <div className="max-w-7xl mx-auto">
-          {/* Hero + Stats Section - you can enhance this later */}
-          {/* Staked Cards */}
-          {stakedNFTs && stakedNFTs.length > 0 && (
-            <div className="mb-12">
-              <h2 className="text-sm font-semibold text-gray-400 uppercase tracking-widest mb-4">
-                Staked SHACKOs ({stakedNFTs.length})
-              </h2>
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                {stakedNFTs.map((id) => (
-                  <StakedNFTCard key={Number(id)} tokenId={Number(id)} /* pass your handlers */ />
-                ))}
+      
+      <main className="pt-32 pb-20 px-6 max-w-7xl mx-auto">
+        {!isConnected ? (
+          <div className="flex flex-col items-center justify-center py-20 text-center">
+            <div className="w-20 h-20 bg-[#fbbf24]/10 rounded-full flex items-center justify-center mb-6 border border-[#fbbf24]/20">
+              <Wallet className="text-[#fbbf24]" size={32} />
+            </div>
+            <h1 className="text-4xl font-bold mb-4">Stake your Shackos</h1>
+            <p className="text-gray-400 mb-8 max-w-md">Connect your wallet to manage your NFTs and start earning $SHACK rewards.</p>
+            <ConnectButton />
+          </div>
+        ) : (
+          <>
+            {/* Stats Header */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+              <div className="bg-white/5 border border-white/10 rounded-3xl p-6">
+                <p className="text-gray-500 text-sm font-medium mb-1">Your Rewards</p>
+                <h2 className="text-3xl font-bold text-[#fbbf24]">
+                  {shackBalance ? Math.floor(Number(formatEther(shackBalance))).toLocaleString() : '0'} <span className="text-sm font-normal text-gray-400">$SHACK</span>
+                </h2>
+              </div>
+              <div className="bg-white/5 border border-white/10 rounded-3xl p-6">
+                <p className="text-gray-500 text-sm font-medium mb-1">Staked Sharks</p>
+                <h2 className="text-3xl font-bold text-emerald-400">{stakedIds.length}</h2>
+              </div>
+              <div className="bg-white/5 border border-white/10 rounded-3xl p-6 flex items-end justify-between">
+                <div>
+                  <p className="text-gray-500 text-sm font-medium mb-1">Available</p>
+                  <h2 className="text-3xl font-bold text-blue-400">{unstakedNfts.length}</h2>
+                </div>
+                {stakedIds.length > 0 && (
+                  <button onClick={handleClaimAll} className="px-4 py-2 bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 rounded-xl text-sm font-bold transition-all">
+                    Claim All
+                  </button>
+                )}
               </div>
             </div>
-          )}
 
-          {/* Unstaked Cards */}
-          {isApproved && (
-            <div>
-              <h2 className="text-sm font-semibold text-gray-400 uppercase tracking-widest mb-4">
-                Available to Stake ({unstakedTokenIds.length})
-              </h2>
-
-              {isLoadingNFTs ? (
-                <p className="text-gray-400">Loading your SHACKO NFTs...</p>
-              ) : unstakedTokenIds.length > 0 ? (
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                  {unstakedTokenIds.map((tokenId) => (
-                    <UnstakedNFTCard
-                      key={tokenId}
-                      tokenId={tokenId}
-                      onStake={(id) => setStakeModalToken(id)}
-                      isStaking={false}
-                    />
-                  ))}
+            {/* Approval Banner */}
+            {!isApproved && (
+              <div className="bg-[#fbbf24]/10 border border-[#fbbf24]/30 rounded-2xl p-6 mb-12 flex flex-col md:flex-row items-center justify-between gap-4">
+                <div className="flex items-center gap-4">
+                  <AlertTriangle className="text-[#fbbf24]" />
+                  <div>
+                    <h3 className="font-bold">Approve Staking</h3>
+                    <p className="text-sm text-gray-400">You need to approve the contract to manage your NFTs before staking.</p>
+                  </div>
                 </div>
-              ) : (
-                <p className="text-gray-400">No unstaked SHACKO NFTs found in your wallet.</p>
+                <button onClick={handleApprove} className="w-full md:w-auto px-8 py-3 bg-[#fbbf24] text-black font-bold rounded-xl hover:scale-105 transition-transform">
+                  Approve Now
+                </button>
+              </div>
+            )}
+
+            {/* NFT Grids */}
+            <div className="space-y-12">
+              <section>
+                <div className="flex items-center justify-between mb-6">
+                  <h2 className="text-xl font-bold flex items-center gap-2">
+                    Available Sharks <span className="text-gray-500 text-sm font-normal">({unstakedNfts.length})</span>
+                  </h2>
+                </div>
+                {isLoadingAlchemy ? (
+                  <div className="flex items-center gap-3 text-gray-500"><Loader2 className="animate-spin" /> Fetching from Base...</div>
+                ) : (
+                  <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-4">
+                    {unstakedNfts.map(nft => (
+                      <NFTCard 
+                        key={nft.tokenId} 
+                        tokenId={nft.tokenId} 
+                        nft={nft} 
+                        actionLabel="Stake" 
+                        onAction={() => setStakeModalToken(Number(nft.tokenId))}
+                      />
+                    ))}
+                  </div>
+                )}
+              </section>
+
+              {stakedIds.length > 0 && (
+                <section>
+                  <h2 className="text-xl font-bold mb-6 flex items-center gap-2">
+                    Staked Sharks <span className="text-emerald-500 text-sm font-normal">({stakedIds.length})</span>
+                  </h2>
+                  <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-4">
+                    {stakedIds.map(id => (
+                      <NFTCard 
+                        key={id} 
+                        tokenId={id} 
+                        actionLabel="Unstake" 
+                        onAction={(id: number) => writeContract({ address: STAKING_CONTRACT, abi: STAKING_ABI, functionName: 'unstake', args: [BigInt(id)] })}
+                      />
+                    ))}
+                  </div>
+                </section>
               )}
             </div>
-          )}
-        </div>
+          </>
+        )}
       </main>
 
       {/* Duration Modal */}
+      <AnimatePresence>
+        {stakeModalToken !== null && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-6 bg-black/80 backdrop-blur-sm">
+            <motion.div initial={{ y: 50 }} animate={{ y: 0 }} exit={{ y: 50 }} className="bg-[#0d1525] border border-white/10 rounded-3xl p-8 max-w-sm w-full">
+              <h2 className="text-2xl font-bold mb-2">Select Duration</h2>
+              <p className="text-gray-400 text-sm mb-6">Locking your shark for longer increases your multiplier.</p>
+              <div className="space-y-3 mb-8">
+                {DURATIONS.map((d) => (
+                  <button 
+                    key={d.value}
+                    onClick={() => handleStake(stakeModalToken, d.value)}
+                    className="w-full p-4 bg-white/5 hover:bg-[#fbbf24]/10 border border-white/5 hover:border-[#fbbf24]/40 rounded-2xl flex items-center justify-between group transition-all"
+                  >
+                    <div className="flex items-center gap-3">
+                      <d.icon size={18} className="text-gray-500 group-hover:text-[#fbbf24]" />
+                      <span className="font-bold">{d.label}</span>
+                    </div>
+                    <span className="text-[#fbbf24] font-bold">{d.multiplier}</span>
+                  </button>
+                ))}
+              </div>
+              <button onClick={() => setStakeModalToken(null)} className="w-full text-gray-500 font-medium py-2">Cancel</button>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
+
       <Footer />
     </div>
   );
