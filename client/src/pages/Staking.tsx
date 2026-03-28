@@ -349,7 +349,7 @@ export default function StakingPage() {
                       onUnstake={(id: number) => writeContract({ address: STAKING_CONTRACT, abi: STAKING_ABI, functionName: 'unstake', args: [BigInt(id)] })}
                       onEmergency={(id: number) => writeContract({ address: STAKING_CONTRACT, abi: STAKING_ABI, functionName: 'emergencyUnstake', args: [BigInt(id)], value: parseEther('0.0002') })}
                     />
-                  ))}
+                  ))
                 </div>
               </section>
 
