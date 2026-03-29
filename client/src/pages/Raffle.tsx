@@ -3,22 +3,19 @@
 import { useState, useEffect } from "react";
 import Header from "@/components/Header";
 import { Footer } from "@/components/Footer";
-import { motion } from "framer-motion";
-import { useAccount, useReadContract, useReadContracts, useWriteContract, useWaitForTransactionReceipt } from "wagmi";
+import { motion, AnimatePresence } from "framer-motion";
+import { useAccount, useReadContract, useWriteContract, useWaitForTransactionReceipt } from "wagmi";
 import { parseAbi, formatEther } from "viem";
-import { Ticket, Trophy, Users, Clock, Zap, Gift, CheckCircle } from "lucide-react";
+import { Trophy, Users, Zap, Gift, Crown, X, ChevronRight, Ticket } from "lucide-react";
+import { ConnectButton } from "@rainbow-me/rainbowkit";
 
-// â”€â”€ MAINNET CONTRACT ADDRESSES â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── CONTRACTS ─────────────────────────────────────────────────────────────
 const SHACK_TOKEN_ADDRESS = "0x2FbCa943BbD81FCCeaedFAdbb324Bba51Fc6A2E3" as `0x${string}`;
 const MULTI_RAFFLE_ADDRESS = "0xAC9fF7A959dEAe07080ABAA8850F01e7D06B5480" as `0x${string}`;
-const SHACKO_NFT = "0x7f30f4b6d5C98D29E32cf013558A01443c87C013";
 const IPFS_IMG = "https://gateway.lighthouse.storage/ipfs/bafybeicizp4e7sh2lou53lyw2gtqsjf6rxcaf3epnkyejwnwjjd6w7mqou";
 
-// â”€â”€ ABIs â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-const SHACK_ABI = parseAbi([
-  "function balanceOf(address account) view returns (uint256)",
-]);
-
+// ── ABIs ──────────────────────────────────────────────────────────────────
+const SHACK_ABI = parseAbi(["function balanceOf(address account) view returns (uint256)"]);
 const RAFFLE_ABI = parseAbi([
   "function getActiveRaffles() view returns (uint256[])",
   "function getCompletedRaffles() view returns (uint256[])",
@@ -27,24 +24,149 @@ const RAFFLE_ABI = parseAbi([
   "function enterRaffle(uint256 raffleId)",
 ]);
 
-interface RaffleData {
-  id: number;
-  nftContract: string;
-  tokenId: bigint;
-  maxEntries: bigint;
-  currentEntries: bigint;
-  entryCost: bigint;
-  isActive: boolean;
-  isComplete: boolean;
-  winner: string;
-}
-
-// â”€â”€ RAFFLE CARD â€” reads live data per raffle â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-function RaffleCard({ raffleId, onEnter, isPending, isConfirming, userAddress }: {
+// ── RAFFLE DETAIL MODAL ───────────────────────────────────────────────────
+function RaffleModal({ raffleId, onClose, onEnter, isPending, isConfirming, userAddress, shackBalance }: {
   raffleId: number;
+  onClose: () => void;
   onEnter: (id: number) => void;
   isPending: boolean;
   isConfirming: boolean;
+  userAddress: string | undefined;
+  shackBalance: bigint | undefined;
+}) {
+  const { data: info } = useReadContract({
+    address: MULTI_RAFFLE_ADDRESS, abi: RAFFLE_ABI, functionName: "getRaffleInfo",
+    args: [BigInt(raffleId)],
+  });
+  const { data: hasEntered } = useReadContract({
+    address: MULTI_RAFFLE_ADDRESS, abi: RAFFLE_ABI, functionName: "hasUserEntered",
+    args: userAddress ? [BigInt(raffleId), userAddress as `0x${string}`] : undefined,
+    query: { enabled: !!userAddress },
+  });
+  const [imgError, setImgError] = useState(false);
+
+  if (!info) return null;
+
+  const [, tokenId, maxEntries, currentEntries, entryCost, isActive, isComplete, winner] = info;
+  const progress = maxEntries > 0n ? Number((currentEntries * 100n) / maxEntries) : 0;
+  const entryCostFormatted = Math.floor(Number(formatEther(entryCost)));
+  const remaining = Number(maxEntries) - Number(currentEntries);
+  const winChance = Number(currentEntries) > 0 ? (1 / (Number(currentEntries) + 1) * 100).toFixed(1) : "100.0";
+  const canAfford = shackBalance ? shackBalance >= entryCost : false;
+  const imageUrl = `${IPFS_IMG}/${tokenId.toString()}.png`;
+
+  return (
+    <motion.div
+      initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+      className="fixed inset-0 z-[100] flex items-center justify-center bg-black/80 backdrop-blur-sm p-4"
+      onClick={onClose}
+    >
+      <motion.div
+        initial={{ scale: 0.95, y: 20 }} animate={{ scale: 1, y: 0 }} exit={{ scale: 0.95, y: 20 }}
+        className="bg-[#0d1525] border border-white/10 rounded-2xl w-full max-w-md overflow-hidden shadow-2xl"
+        onClick={(e) => e.stopPropagation()}
+      >
+        {/* Image */}
+        <div className="relative h-56 overflow-hidden bg-white/5">
+          {!imgError ? (
+            <img src={imageUrl} alt="" className="w-full h-full object-cover" onError={() => setImgError(true)} />
+          ) : (
+            <div className="w-full h-full flex items-center justify-center">
+              <Trophy size={48} className="text-white/20" />
+            </div>
+          )}
+          <div className="absolute inset-0 bg-gradient-to-t from-[#0d1525] via-transparent to-transparent" />
+          <button onClick={onClose} className="absolute top-3 right-3 w-8 h-8 bg-black/60 backdrop-blur-sm rounded-full flex items-center justify-center text-white/70 hover:text-white transition-colors border border-white/10">
+            <X size={14} />
+          </button>
+          <div className="absolute top-3 left-3 flex gap-2">
+            <span className="bg-black/60 backdrop-blur-sm text-white/80 px-2.5 py-1 rounded-lg text-xs font-semibold border border-white/10">Raffle #{raffleId}</span>
+            {isComplete && <span className="bg-emerald-500/20 backdrop-blur-sm text-emerald-400 px-2.5 py-1 rounded-lg text-xs font-semibold border border-emerald-500/30">✓ Complete</span>}
+          </div>
+          <div className="absolute bottom-3 left-4">
+            <p className="text-white font-bold text-lg">SHACKO #{tokenId.toString()}</p>
+          </div>
+        </div>
+
+        <div className="p-5">
+          {/* Stats grid */}
+          <div className="grid grid-cols-4 gap-2 mb-5">
+            {[
+              { label: "Total", value: maxEntries.toString() },
+              { label: "Entered", value: currentEntries.toString() },
+              { label: "Win Chance", value: `${winChance}%` },
+              { label: "Remaining", value: remaining.toString() },
+            ].map(({ label, value }) => (
+              <div key={label} className="bg-white/5 border border-white/5 rounded-xl p-2.5 text-center">
+                <p className="text-[10px] text-gray-500 mb-1">{label}</p>
+                <p className="text-sm font-bold text-white">{value}</p>
+              </div>
+            ))}
+          </div>
+
+          {/* Progress */}
+          <div className="mb-4">
+            <div className="flex justify-between text-xs text-gray-500 mb-1.5">
+              <span>Participants</span>
+              <span className={progress === 100 ? "text-emerald-400" : "text-[#fbbf24]"}>{progress}%</span>
+            </div>
+            <div className="h-2 w-full bg-white/5 rounded-full overflow-hidden">
+              <div className={`h-full rounded-full transition-all duration-500 ${progress === 100 ? "bg-emerald-400" : "bg-gradient-to-r from-[#fbbf24] to-[#f59e0b]"}`} style={{ width: `${progress}%` }} />
+            </div>
+          </div>
+
+          {/* Entry cost */}
+          <div className="bg-white/5 border border-white/5 rounded-xl px-4 py-3 mb-4 flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <Zap size={14} className="text-[#fbbf24]" />
+              <span className="text-sm text-gray-400">Entry Cost</span>
+            </div>
+            <span className="text-sm font-bold text-white">{entryCostFormatted} $SHACK</span>
+          </div>
+
+          {/* Winner section */}
+          {isComplete && (
+            <div className="bg-emerald-500/10 border border-emerald-500/20 rounded-xl px-4 py-3 mb-4">
+              <div className="flex items-center gap-2 mb-1">
+                <Crown size={14} className="text-emerald-400" />
+                <span className="text-xs text-emerald-400 font-semibold uppercase tracking-wide">Winner Selected</span>
+              </div>
+              <p className="text-sm font-bold text-white break-all">{winner.slice(0, 10)}...{winner.slice(-8)}</p>
+            </div>
+          )}
+
+          {/* Enter button */}
+          {!isComplete && (
+            <>
+              {!userAddress ? (
+                <div className="flex justify-center">
+                  <ConnectButton />
+                </div>
+              ) : !canAfford ? (
+                <div className="w-full bg-white/5 border border-white/10 text-gray-500 font-semibold py-3 rounded-xl text-sm text-center">
+                  Insufficient $SHACK Balance
+                </div>
+              ) : (
+                <button
+                  onClick={() => onEnter(raffleId)}
+                  disabled={isPending || isConfirming || !!hasEntered || !isActive}
+                  className="w-full bg-[#fbbf24] hover:bg-[#f59e0b] disabled:opacity-40 disabled:cursor-not-allowed text-black font-bold py-3 rounded-xl transition-colors text-sm"
+                >
+                  {hasEntered ? "✓ Already Entered" : isPending || isConfirming ? "Entering..." : `Enter Raffle · ${entryCostFormatted} $SHACK`}
+                </button>
+              )}
+            </>
+          )}
+        </div>
+      </motion.div>
+    </motion.div>
+  );
+}
+
+// ── ACTIVE RAFFLE CARD ────────────────────────────────────────────────────
+function ActiveRaffleCard({ raffleId, onClick, userAddress }: {
+  raffleId: number;
+  onClick: () => void;
   userAddress: string | undefined;
 }) {
   const { data: info } = useReadContract({
@@ -56,90 +178,76 @@ function RaffleCard({ raffleId, onEnter, isPending, isConfirming, userAddress }:
     args: userAddress ? [BigInt(raffleId), userAddress as `0x${string}`] : undefined,
     query: { enabled: !!userAddress },
   });
-
   const [imgError, setImgError] = useState(false);
 
   if (!info) return (
-    <div className="bg-gradient-to-br from-[#8b5cf6] to-[#7c3aed] border-4 border-black rounded-3xl overflow-hidden shadow-2xl animate-pulse">
-      <div className="h-64 bg-white/10" />
-      <div className="p-6 space-y-3">
-        <div className="h-6 bg-white/20 rounded w-1/2" />
-        <div className="h-4 bg-white/20 rounded w-full" />
-        <div className="h-12 bg-white/20 rounded" />
+    <div className="bg-[#0d1525] border border-white/5 rounded-2xl overflow-hidden animate-pulse">
+      <div className="aspect-square bg-white/5" />
+      <div className="p-4 space-y-2">
+        <div className="h-4 bg-white/5 rounded w-2/3" />
+        <div className="h-3 bg-white/5 rounded w-full" />
+        <div className="h-9 bg-white/5 rounded mt-2" />
       </div>
     </div>
   );
 
-  const [nftContract, tokenId, maxEntries, currentEntries, entryCost, isActive, isComplete, winner] = info;
+  const [, tokenId, maxEntries, currentEntries, entryCost] = info;
   const progress = maxEntries > 0n ? Number((currentEntries * 100n) / maxEntries) : 0;
   const entryCostFormatted = Math.floor(Number(formatEther(entryCost)));
   const imageUrl = `${IPFS_IMG}/${tokenId.toString()}.png`;
 
   return (
     <motion.div
-      initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}
-      className="bg-gradient-to-br from-[#8b5cf6] to-[#7c3aed] border-4 border-black rounded-3xl overflow-hidden shadow-2xl"
+      initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}
+      whileHover={{ y: -2 }}
+      className="bg-[#0d1525] border border-white/5 hover:border-white/15 rounded-2xl overflow-hidden cursor-pointer transition-all group"
+      onClick={onClick}
     >
-      <div className="h-64 bg-gradient-to-br from-white/10 to-white/5 border-b-4 border-black overflow-hidden relative">
+      {/* Image */}
+      <div className="relative aspect-square overflow-hidden bg-white/5">
         {!imgError ? (
-          <img src={imageUrl} alt={`SHACKO #${tokenId}`} className="w-full h-full object-cover" onError={() => setImgError(true)} />
+          <img src={imageUrl} alt="" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" onError={() => setImgError(true)} />
         ) : (
           <div className="w-full h-full flex items-center justify-center">
-            <div className="text-center">
-              <Trophy size={64} className="text-white mx-auto mb-4" />
-              <p className="text-white font-black text-2xl">SHACKO #{tokenId.toString()}</p>
-            </div>
+            <Trophy size={40} className="text-white/10" />
           </div>
         )}
-        <div className="absolute top-3 left-3 bg-black/70 backdrop-blur-sm text-white px-3 py-1 rounded-full text-xs font-bold border border-white/20">
+        <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
+        {/* Raffle number */}
+        <div className="absolute top-2 left-2 bg-[#fbbf24] text-black px-2 py-0.5 rounded-md text-xs font-black">
           #{raffleId}
+        </div>
+        {hasEntered && (
+          <div className="absolute top-2 right-2 bg-emerald-500/20 border border-emerald-500/40 text-emerald-400 px-2 py-0.5 rounded-md text-xs font-semibold backdrop-blur-sm">
+            ✓ Entered
+          </div>
+        )}
+        {/* Progress overlay at bottom of image */}
+        <div className="absolute bottom-0 left-0 right-0 px-3 py-2 bg-black/60 backdrop-blur-sm">
+          <div className="flex items-center justify-between text-xs mb-1">
+            <span className="text-gray-400">{currentEntries.toString()}/{maxEntries.toString()} entries</span>
+            <span className="text-[#fbbf24] font-semibold">{progress}%</span>
+          </div>
+          <div className="h-1 w-full bg-white/10 rounded-full">
+            <div className="h-full bg-[#fbbf24] rounded-full transition-all" style={{ width: `${progress}%` }} />
+          </div>
         </div>
       </div>
 
-      <div className="p-6">
-        <h3 className="text-3xl font-black text-white mb-4" style={{ fontFamily: "'Bebas Neue', 'Impact', sans-serif" }}>
-          SHACKO #{tokenId.toString()}
-        </h3>
-
-        <div className="mb-5">
-          <div className="flex justify-between text-white font-bold mb-2">
-            <span>Entries</span>
-            <span>{currentEntries.toString()}/{maxEntries.toString()}</span>
-          </div>
-          <div className="w-full bg-black/30 rounded-full h-5 border-2 border-white/20 overflow-hidden">
-            <div className="bg-gradient-to-r from-[#fbbf24] to-[#f59e0b] h-full rounded-full transition-all duration-500" style={{ width: `${progress}%` }} />
-          </div>
-          <p className="text-white/80 text-sm mt-1 font-semibold text-right">{progress}% Full</p>
-        </div>
-
-        <div className="space-y-2 mb-5">
-          <div className="flex justify-between items-center bg-white/10 rounded-xl p-3 border-2 border-white/20">
-            <span className="text-white/80 font-bold">Entry Cost</span>
-            <span className="text-white font-black">{entryCostFormatted} $SHACK</span>
-          </div>
-          <div className="flex justify-between items-center bg-white/10 rounded-xl p-3 border-2 border-white/20">
-            <span className="text-white/80 font-bold">Your Status</span>
-            <span className={`font-black ${hasEntered ? "text-emerald-300" : "text-white"}`}>
-              {hasEntered ? "âœ“ Entered" : "Not Entered"}
-            </span>
-          </div>
-        </div>
-
-        <button
-          onClick={() => onEnter(raffleId)}
-          disabled={isPending || isConfirming || !!hasEntered || !isActive}
-          className="w-full bg-gradient-to-r from-[#fbbf24] to-[#f59e0b] text-black font-black py-4 rounded-xl border-4 border-black hover:opacity-90 transition-opacity disabled:opacity-50 text-xl"
-          style={{ fontFamily: "'Bebas Neue', 'Impact', sans-serif" }}
-        >
-          {hasEntered ? "ALREADY ENTERED" : isPending || isConfirming ? "ENTERING..." : `ENTER (${entryCostFormatted} $SHACK)`}
+      {/* Card body */}
+      <div className="p-4">
+        <p className="text-white font-bold text-sm mb-0.5">SHACKO #{tokenId.toString()}</p>
+        <p className="text-xs text-gray-500 mb-3">{entryCostFormatted} $SHACK per entry</p>
+        <button className="w-full flex items-center justify-center gap-1.5 bg-[#fbbf24]/10 hover:bg-[#fbbf24]/20 border border-[#fbbf24]/20 text-[#fbbf24] font-semibold py-2 rounded-xl transition-colors text-sm">
+          View Raffle <ChevronRight size={14} />
         </button>
       </div>
     </motion.div>
   );
 }
 
-// â”€â”€ COMPLETED RAFFLE CARD â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-function CompletedRaffleCard({ raffleId }: { raffleId: number }) {
+// ── COMPLETED RAFFLE CARD ─────────────────────────────────────────────────
+function CompletedRaffleCard({ raffleId, onClick }: { raffleId: number; onClick: () => void }) {
   const { data: info } = useReadContract({
     address: MULTI_RAFFLE_ADDRESS, abi: RAFFLE_ABI, functionName: "getRaffleInfo",
     args: [BigInt(raffleId)],
@@ -147,57 +255,62 @@ function CompletedRaffleCard({ raffleId }: { raffleId: number }) {
   const [imgError, setImgError] = useState(false);
 
   if (!info) return null;
-  const [, tokenId, maxEntries, , , , , winner] = info;
+  const [, tokenId, maxEntries, , entryCost, , , winner] = info;
+  const entryCostFormatted = Math.floor(Number(formatEther(entryCost)));
   const imageUrl = `${IPFS_IMG}/${tokenId.toString()}.png`;
 
   return (
     <motion.div
-      initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}
-      className="bg-gradient-to-br from-[#10b981] to-[#14b8a6] border-4 border-black rounded-3xl overflow-hidden shadow-2xl relative"
+      initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}
+      whileHover={{ y: -2 }}
+      className="bg-[#0d1525] border border-white/5 hover:border-emerald-500/20 rounded-2xl overflow-hidden cursor-pointer transition-all group"
+      onClick={onClick}
     >
-      <div className="absolute top-4 right-4 bg-black/80 text-white px-4 py-1.5 rounded-full font-black text-xs uppercase tracking-wider border-2 border-white/30 z-10">
-        âœ“ Complete
-      </div>
-      <div className="h-48 border-b-4 border-black overflow-hidden">
+      <div className="relative aspect-square overflow-hidden bg-white/5">
         {!imgError ? (
-          <img src={imageUrl} alt="" className="w-full h-full object-cover" onError={() => setImgError(true)} />
+          <img src={imageUrl} alt="" className="w-full h-full object-cover opacity-75 group-hover:opacity-90 transition-opacity" onError={() => setImgError(true)} />
         ) : (
-          <div className="w-full h-full flex items-center justify-center bg-white/10">
-            <CheckCircle size={64} className="text-white" />
+          <div className="w-full h-full flex items-center justify-center">
+            <Trophy size={40} className="text-white/10" />
           </div>
         )}
-      </div>
-      <div className="p-6">
-        <h3 className="text-3xl font-black text-white mb-4" style={{ fontFamily: "'Bebas Neue', 'Impact', sans-serif" }}>
-          SHACKO #{tokenId.toString()}
-        </h3>
-        <div className="bg-white/10 rounded-xl p-4 border-2 border-white/20 mb-3">
-          <p className="text-white/80 font-bold text-sm mb-1">Winner</p>
-          <p className="text-white font-black text-lg break-all">{winner.slice(0, 6)}...{winner.slice(-4)}</p>
+        <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent" />
+        <div className="absolute top-2 left-2 bg-emerald-500/20 border border-emerald-500/40 text-emerald-400 px-2 py-0.5 rounded-md text-xs font-semibold backdrop-blur-sm">
+          ✓ Complete
         </div>
-        <div className="flex justify-between text-white font-bold">
-          <span>Total Entries:</span>
-          <span>{maxEntries.toString()}</span>
+        <div className="absolute top-2 right-2 bg-black/60 text-white/60 px-2 py-0.5 rounded-md text-xs backdrop-blur-sm">
+          #{raffleId}
+        </div>
+      </div>
+      <div className="p-4">
+        <p className="text-white font-bold text-sm mb-1">SHACKO #{tokenId.toString()}</p>
+        <div className="flex items-center gap-1.5 mb-3">
+          <Crown size={11} className="text-emerald-400" />
+          <p className="text-xs text-emerald-400 font-semibold">Winner: {winner.slice(0, 6)}...{winner.slice(-4)}</p>
+        </div>
+        <div className="flex items-center justify-between text-xs text-gray-600">
+          <span>{maxEntries.toString()} entries</span>
+          <span>{entryCostFormatted} $SHACK each</span>
         </div>
       </div>
     </motion.div>
   );
 }
 
+// ── MAIN PAGE ─────────────────────────────────────────────────────────────
 export default function Raffle() {
   const { address, isConnected } = useAccount();
+  const [selectedRaffle, setSelectedRaffle] = useState<number | null>(null);
+  const [selectedCompleted, setSelectedCompleted] = useState<number | null>(null);
 
-  // Read $SHACK balance
   const { data: shackBalance } = useReadContract({
     address: SHACK_TOKEN_ADDRESS, abi: SHACK_ABI, functionName: "balanceOf",
     args: address ? [address] : undefined,
   });
 
-  // Read active & completed raffle IDs from contract
   const { data: activeRaffleIds, refetch: refetchActive } = useReadContract({
     address: MULTI_RAFFLE_ADDRESS, abi: RAFFLE_ABI, functionName: "getActiveRaffles",
   });
-
   const { data: completedRaffleIds } = useReadContract({
     address: MULTI_RAFFLE_ADDRESS, abi: RAFFLE_ABI, functionName: "getCompletedRaffles",
   });
@@ -205,12 +318,11 @@ export default function Raffle() {
   const activeIds = (activeRaffleIds as bigint[] | undefined)?.map(Number) ?? [];
   const completedIds = (completedRaffleIds as bigint[] | undefined)?.map(Number) ?? [];
 
-  // Write
   const { writeContract, data: hash, isPending } = useWriteContract();
   const { isLoading: isConfirming, isSuccess } = useWaitForTransactionReceipt({ hash });
 
   useEffect(() => {
-    if (isSuccess) setTimeout(() => refetchActive(), 2000);
+    if (isSuccess) { setTimeout(() => refetchActive(), 2000); setSelectedRaffle(null); }
   }, [isSuccess]);
 
   const handleEnterRaffle = (raffleId: number) => {
@@ -218,226 +330,154 @@ export default function Raffle() {
     writeContract({ address: MULTI_RAFFLE_ADDRESS, abi: RAFFLE_ABI, functionName: "enterRaffle", args: [BigInt(raffleId)] });
   };
 
-  const formatShack = (balance: bigint | undefined) => {
-    if (!balance) return "0";
-    return Math.floor(Number(balance) / 1e18).toLocaleString();
-  };
-
-  const getProgressPercentage = (current: bigint, max: bigint) => {
-    if (max === BigInt(0)) return 0;
-    return Number((current * BigInt(100)) / max);
-  };
-
-  const steps = [
-    {
-      icon: Ticket,
-      title: "Earn $SHACK",
-      description: "Stake your SHACKO NFTs to earn $SHACK tokens",
-      color: "from-[#0ea5e9] to-[#38bdf8]",
-    },
-    {
-      icon: Trophy,
-      title: "Choose Raffle",
-      description: "Browse active raffles and select your prize",
-      color: "from-[#ec4899] to-[#f97316]",
-    },
-    {
-      icon: Users,
-      title: "Enter with $SHACK",
-      description: "Burn 100 $SHACK to enter (1 entry per raffle)",
-      color: "from-[#fbbf24] to-[#f59e0b]",
-    },
-    {
-      icon: Zap,
-      title: "Auto Draw",
-      description: "Winner picked automatically when raffle fills up!",
-      color: "from-[#10b981] to-[#14b8a6]",
-    },
-  ];
+  const shackFormatted = shackBalance ? Math.floor(Number(formatEther(shackBalance as bigint))).toLocaleString() : "0";
 
   return (
-    <div className="min-h-screen bg-[#0a0e27] overflow-x-hidden">
+    <div className="min-h-screen bg-[#060b18] overflow-x-hidden">
       <Header />
 
-      <main className="pt-40 pb-20 px-6">
+      <main className="pt-32 pb-20 px-4 md:px-8">
         <div className="max-w-7xl mx-auto">
-          {/* Page Header */}
-          <motion.div
-            initial={{ opacity: 0, y: -30 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="text-center mb-16"
-          >
-            <h1
-              className="text-[15vw] md:text-[150px] font-black text-transparent bg-clip-text bg-gradient-to-r from-[#8b5cf6] to-[#7c3aed] leading-none mb-8"
-              style={{
-                fontFamily: "'Bebas Neue', 'Impact', sans-serif",
-                WebkitTextStroke: "2px rgba(139, 92, 246, 0.3)",
-              }}
-            >
-              SHACKO RAFFLES
-            </h1>
-            <p className="text-2xl md:text-3xl text-gray-300 font-bold max-w-3xl mx-auto">
-              Enter raffles with $SHACK and win exclusive NFTs!
-            </p>
-          </motion.div>
 
-          {/* $SHACK Balance */}
-          {isConnected ? (
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              className="mb-16"
-            >
-              <div className="bg-gradient-to-br from-[#fbbf24] to-[#f59e0b] border-4 border-black rounded-3xl p-8 shadow-2xl max-w-2xl mx-auto">
-                <div className="flex items-center gap-4 mb-4">
-                  <div className="w-16 h-16 rounded-full bg-white/20 backdrop-blur-sm border-2 border-white/40 flex items-center justify-center">
-                    <Zap size={32} className="text-white" />
-                  </div>
-                  <h3
-                    className="text-3xl font-black text-white"
-                    style={{ fontFamily: "'Bebas Neue', 'Impact', sans-serif" }}
-                  >
-                    Your $SHACK Balance
-                  </h3>
-                </div>
-                <p className="text-6xl font-black text-white mb-2">{formatShack(shackBalance as bigint)}</p>
-                <p className="text-lg text-white/90 font-semibold">Each entry costs 100 $SHACK</p>
+          {/* Page Header */}
+          <div className="mb-10">
+            <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-4">
+              <div>
+                <h1 className="text-2xl font-bold text-white mb-1">SHACKO Raffles</h1>
+                <p className="text-gray-500 text-sm">Burn $SHACK to enter — winner picked automatically when full</p>
               </div>
-            </motion.div>
-          ) : (
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              className="bg-gradient-to-br from-[#1a3a52] to-[#0f1729] border-2 border-[#00d9ff]/30 rounded-3xl p-10 text-center mb-16"
-            >
-              <p className="text-2xl md:text-3xl font-bold text-white mb-4">
-                Connect your wallet to view raffles and enter
-              </p>
-              <p className="text-lg text-gray-400">
-                You'll need $SHACK tokens to participate in raffles
-              </p>
-            </motion.div>
+              {/* $SHACK balance pill */}
+              {isConnected && (
+                <div className="flex items-center gap-2 bg-[#0d1525] border border-white/5 rounded-xl px-4 py-2.5">
+                  <Zap size={14} className="text-[#fbbf24]" />
+                  <span className="text-sm text-gray-400">Your Balance</span>
+                  <span className="text-sm font-bold text-white">{shackFormatted} $SHACK</span>
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* Connect prompt */}
+          {!isConnected && (
+            <div className="bg-[#0d1525] border border-[#fbbf24]/20 rounded-2xl p-6 flex flex-col sm:flex-row items-center justify-between gap-4 mb-8">
+              <div>
+                <p className="text-white font-semibold text-sm mb-0.5">Connect your wallet</p>
+                <p className="text-gray-500 text-xs">Connect to view your $SHACK balance and enter raffles</p>
+              </div>
+              <ConnectButton />
+            </div>
           )}
 
-          {/* How to Participate */}
-          <div className="bg-gradient-to-b from-[#1a1f3a] to-[#2d1b4e] border-4 border-black rounded-3xl p-10 mb-16 shadow-2xl">
-            <h2
-              className="text-6xl md:text-8xl font-black text-white mb-12 text-center"
-              style={{ fontFamily: "'Bebas Neue', 'Impact', sans-serif" }}
-            >
-              How It Works
-            </h2>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-              {steps.map((step, index) => {
-                const Icon = step.icon;
-                return (
-                  <motion.div
-                    key={index}
-                    initial={{ opacity: 0, y: 20 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    viewport={{ once: true }}
-                    transition={{ delay: index * 0.1 }}
-                    className={`bg-gradient-to-br ${step.color} rounded-2xl p-6 border-4 border-black text-center shadow-xl`}
-                  >
-                    <div className="w-16 h-16 rounded-full bg-white/20 backdrop-blur-sm border-2 border-white/40 flex items-center justify-center mx-auto mb-4">
-                      <Icon size={32} className="text-white" />
-                    </div>
-                    <div
-                      className="text-5xl font-black text-white mb-2"
-                      style={{ fontFamily: "'Bebas Neue', 'Impact', sans-serif" }}
-                    >
-                      {index + 1}
-                    </div>
-                    <h3 className="text-2xl font-black text-white mb-3">{step.title}</h3>
-                    <p className="text-white/90 font-semibold">{step.description}</p>
-                  </motion.div>
-                );
-              })}
-            </div>
+          {/* How it works */}
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-10">
+            {[
+              { icon: Ticket,   label: "Earn $SHACK",     desc: "Stake NFTs to earn",         color: "text-blue-400",    bg: "bg-blue-500/10",    border: "border-blue-500/20" },
+              { icon: Trophy,   label: "Choose Raffle",   desc: "Pick your prize",             color: "text-purple-400",  bg: "bg-purple-500/10",  border: "border-purple-500/20" },
+              { icon: Users,    label: "Burn to Enter",   desc: "1 entry per wallet",          color: "text-[#fbbf24]",   bg: "bg-[#fbbf24]/10",   border: "border-[#fbbf24]/20" },
+              { icon: Zap,      label: "Auto Draw",       desc: "Instant winner when full",    color: "text-emerald-400", bg: "bg-emerald-500/10", border: "border-emerald-500/20" },
+            ].map(({ icon: Icon, label, desc, color, bg, border }) => (
+              <div key={label} className={`${bg} border ${border} rounded-2xl p-4 flex flex-col gap-2`}>
+                <Icon size={18} className={color} />
+                <p className={`text-sm font-semibold ${color}`}>{label}</p>
+                <p className="text-xs text-gray-500">{desc}</p>
+              </div>
+            ))}
           </div>
 
           {/* Active Raffles */}
           {activeIds.length > 0 ? (
-            <div className="mb-16">
-              <h2
-                className="text-6xl md:text-8xl font-black text-white text-center mb-12"
-                style={{ fontFamily: "'Bebas Neue', 'Impact', sans-serif" }}
-              >
-                Active Raffles
-              </h2>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            <div className="mb-12">
+              <div className="flex items-center justify-between mb-5">
+                <h2 className="text-sm font-semibold text-gray-400 uppercase tracking-widest">
+                  Active Raffles ({activeIds.length})
+                </h2>
+              </div>
+              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
                 {activeIds.map((id) => (
-                  <RaffleCard
-                    key={id}
-                    raffleId={id}
-                    onEnter={handleEnterRaffle}
-                    isPending={isPending}
-                    isConfirming={isConfirming}
+                  <ActiveRaffleCard
+                    key={id} raffleId={id}
+                    onClick={() => setSelectedRaffle(id)}
                     userAddress={address}
                   />
                 ))}
               </div>
             </div>
           ) : (
-            <div className="mb-16">
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                className="bg-gradient-to-br from-[#ec4899] to-[#f97316] border-4 border-black rounded-3xl p-10 text-center shadow-2xl"
-              >
-                <Gift size={80} className="text-white mx-auto mb-6" />
-                <h3
-                  className="text-5xl md:text-7xl font-black text-white mb-6"
-                  style={{ fontFamily: "'Bebas Neue', 'Impact', sans-serif" }}
-                >
-                  No Active Raffles
-                </h3>
-                <p className="text-xl md:text-2xl text-white font-bold mb-4 max-w-3xl mx-auto">
-                  New raffles coming soon! Start staking to earn $SHACK.
-                </p>
-              </motion.div>
+            <div className="bg-[#0d1525] border border-white/5 rounded-2xl p-16 text-center mb-12">
+              <Gift size={32} className="text-gray-600 mx-auto mb-3" />
+              <p className="text-gray-400 font-medium">No active raffles right now</p>
+              <p className="text-gray-600 text-sm mt-1">New raffles coming soon — keep staking to earn $SHACK!</p>
             </div>
           )}
 
-          {/* Completed Raffles */}
+          {/* Past Winners */}
           {completedIds.length > 0 && (
-            <div className="mb-16">
-              <h2
-                className="text-6xl md:text-8xl font-black text-white text-center mb-12"
-                style={{ fontFamily: "'Bebas Neue', 'Impact', sans-serif" }}
-              >
-                Past Winners
+            <div>
+              <h2 className="text-sm font-semibold text-gray-400 uppercase tracking-widest mb-5">
+                Past Winners ({completedIds.length})
               </h2>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
                 {completedIds.map((id) => (
-                  <CompletedRaffleCard key={id} raffleId={id} />
+                  <CompletedRaffleCard key={id} raffleId={id} onClick={() => setSelectedCompleted(id)} />
                 ))}
               </div>
             </div>
           )}
 
-          {/* Transaction Status */}
-          {isConfirming && (
-            <div className="fixed bottom-8 right-8 bg-gradient-to-r from-[#fbbf24] to-[#f59e0b] border-4 border-black rounded-2xl p-6 shadow-2xl z-50">
-              <p className="text-black font-black text-lg">
-                â³ Confirming transaction...
-              </p>
-            </div>
-          )}
-
-          {isSuccess && (
-            <div className="fixed bottom-8 right-8 bg-gradient-to-r from-[#10b981] to-[#14b8a6] border-4 border-black rounded-2xl p-6 shadow-2xl z-50">
-              <p className="text-white font-black text-lg">
-                âœ… Entry successful!
-              </p>
-            </div>
-          )}
         </div>
       </main>
+
+      {/* Active Raffle Modal */}
+      <AnimatePresence>
+        {selectedRaffle !== null && (
+          <RaffleModal
+            raffleId={selectedRaffle}
+            onClose={() => setSelectedRaffle(null)}
+            onEnter={handleEnterRaffle}
+            isPending={isPending}
+            isConfirming={isConfirming}
+            userAddress={address}
+            shackBalance={shackBalance as bigint | undefined}
+          />
+        )}
+      </AnimatePresence>
+
+      {/* Completed Raffle Modal */}
+      <AnimatePresence>
+        {selectedCompleted !== null && (
+          <RaffleModal
+            raffleId={selectedCompleted}
+            onClose={() => setSelectedCompleted(null)}
+            onEnter={handleEnterRaffle}
+            isPending={isPending}
+            isConfirming={isConfirming}
+            userAddress={address}
+            shackBalance={shackBalance as bigint | undefined}
+          />
+        )}
+      </AnimatePresence>
+
+      {/* Toast notifications */}
+      <AnimatePresence>
+        {isConfirming && (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: 20 }}
+            className="fixed bottom-6 right-6 bg-[#0d1525] border border-[#fbbf24]/30 rounded-2xl px-5 py-4 shadow-2xl z-50 flex items-center gap-3"
+          >
+            <div className="w-2 h-2 bg-[#fbbf24] rounded-full animate-pulse" />
+            <p className="text-white text-sm font-medium">Confirming entry...</p>
+          </motion.div>
+        )}
+        {isSuccess && (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: 20 }}
+            className="fixed bottom-6 right-6 bg-emerald-500/10 border border-emerald-500/30 rounded-2xl px-5 py-4 shadow-2xl z-50 flex items-center gap-3"
+          >
+            <div className="w-2 h-2 bg-emerald-400 rounded-full" />
+            <p className="text-emerald-400 text-sm font-medium">✅ Entry successful!</p>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       <Footer />
     </div>
